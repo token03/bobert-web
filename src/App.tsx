@@ -563,13 +563,13 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
           </div>
           <div className="version-line">
             <span>{beatmap.version ?? 'Unknown difficulty'}</span>
-            {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)} match</span> : null}
           </div>
           <div className="meta-line">
             <CreatorLink beatmap={beatmap} />
             <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
           </div>
           <div className="row-actions">
+            {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)} match</span> : null}
             <button type="button" aria-label="Play preview" title="Play preview">
               <PlayIcon />
             </button>
