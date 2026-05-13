@@ -474,7 +474,7 @@ button:disabled {
 
 .map-content {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) minmax(188px, 0.72fr);
   align-items: center;
   gap: 14px;
   min-width: 0;
@@ -561,12 +561,24 @@ button:disabled {
   text-decoration: none;
 }
 
+.status-label {
+  color: var(--muted);
+}
+
+.status-ranked {
+  color: #ffd166;
+}
+
+.status-graveyard {
+  color: var(--muted);
+}
+
 .stat-strip {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 12px;
-  min-width: 208px;
+  min-width: 188px;
 }
 
 .stat-row {
@@ -582,7 +594,16 @@ button:disabled {
 .stat-row-sub {
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
+  gap: 7px;
+}
+
+.stat-row-sub .stat-item {
+  grid-template-columns: auto auto;
+  align-items: baseline;
+  justify-content: start;
+  gap: 5px;
+  min-width: 0;
+  text-align: left;
 }
 
 .stat-item {
@@ -723,7 +744,7 @@ button:disabled {
   }
 
   .map-content {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) minmax(176px, 0.68fr);
     gap: 10px;
   }
 
@@ -732,7 +753,7 @@ button:disabled {
   }
 
   .stat-strip {
-    min-width: 184px;
+    min-width: 176px;
     gap: 8px;
   }
 

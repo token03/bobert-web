@@ -563,11 +563,11 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
           </div>
           <div className="version-line">
             <span>{beatmap.version ?? 'Unknown difficulty'}</span>
-            {beatmap.score !== undefined ? <span className="match-pill">{beatmap.score.toFixed(3)} match</span> : null}
+            {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)} match</span> : null}
           </div>
           <div className="meta-line">
             <CreatorLink beatmap={beatmap} />
-            <span>{statusLabel(beatmap.status)}</span>
+            <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
           </div>
           <div className="row-actions">
             <button type="button" aria-label="Play preview" title="Play preview">
@@ -780,6 +780,10 @@ function formatLength(value: number | null): string {
   return `${minutes}:${seconds}`
 }
 
+function formatMatch(value: number): string {
+  return `${(value * 100).toFixed(2)}%`
+}
+
 function statusLabel(value: string | null): string {
   const statuses: Record<string, string> = {
     '-2': 'graveyard',
@@ -796,6 +800,11 @@ function statusLabel(value: string | null): string {
   }
 
   return statuses[value] ?? value
+}
+
+function statusClass(value: string | null): string {
+  const label = statusLabel(value)
+  return `status-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
 }
 
 export default App
