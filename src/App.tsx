@@ -63,6 +63,10 @@ const defaultFilters = {
   topK: '20',
   minSr: '',
   maxSr: '',
+  minBpm: '',
+  maxBpm: '',
+  minLength: '',
+  maxLength: '',
   minAr: '',
   maxAr: '',
   minCs: '',
@@ -85,6 +89,10 @@ function App() {
   const [topK, setTopK] = useState(defaultFilters.topK)
   const [minSr, setMinSr] = useState(defaultFilters.minSr)
   const [maxSr, setMaxSr] = useState(defaultFilters.maxSr)
+  const [minBpm, setMinBpm] = useState(defaultFilters.minBpm)
+  const [maxBpm, setMaxBpm] = useState(defaultFilters.maxBpm)
+  const [minLength, setMinLength] = useState(defaultFilters.minLength)
+  const [maxLength, setMaxLength] = useState(defaultFilters.maxLength)
   const [minAr, setMinAr] = useState(defaultFilters.minAr)
   const [maxAr, setMaxAr] = useState(defaultFilters.maxAr)
   const [minCs, setMinCs] = useState(defaultFilters.minCs)
@@ -95,11 +103,11 @@ function App() {
   const [maxHp, setMaxHp] = useState(defaultFilters.maxHp)
   const [status, setStatus] = useState(defaultFilters.status)
   const [excludeSameSet, setExcludeSameSet] = useState(defaultFilters.excludeSameSet)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
   const [, setTurnstileStatus] = useState(
     turnstileSiteKey ? 'waiting' : 'disabled',
   )
   const [isLoading, setIsLoading] = useState(false)
-  const [httpStatus, setHttpStatus] = useState<number | null>(null)
   const [error, setError] = useState('')
   const [response, setResponse] = useState<RecommendResponse | null>(null)
   const [copiedBeatmapId, setCopiedBeatmapId] = useState<number | null>(null)
@@ -187,7 +195,6 @@ function App() {
     const beatmapId = parseBeatmapId(beatmapInput)
     if (!beatmapId) {
       setError('Enter a beatmap ID or a beatmap link ending in an ID.')
-      setHttpStatus(null)
       setResponse(null)
       return
     }
@@ -195,9 +202,8 @@ function App() {
     setIsLoading(true)
     setError('')
     setResponse(null)
-    setHttpStatus(null)
 
-    const filters = {
+    const filters: Record<string, boolean | number | string | null> = {
       min_sr: numericOrNull(minSr),
       max_sr: numericOrNull(maxSr),
       min_ar: numericOrNull(minAr),
@@ -210,6 +216,23 @@ function App() {
       max_drain: numericOrNull(maxHp),
       status: status.trim() || null,
       exclude_same_set: excludeSameSet,
+    }
+    const minBpmValue = numericOrNull(minBpm)
+    const maxBpmValue = numericOrNull(maxBpm)
+    const minLengthValue = numericOrNull(minLength)
+    const maxLengthValue = numericOrNull(maxLength)
+
+    if (minBpmValue !== null) {
+      filters.min_bpm = minBpmValue
+    }
+    if (maxBpmValue !== null) {
+      filters.max_bpm = maxBpmValue
+    }
+    if (minLengthValue !== null) {
+      filters.min_length = minLengthValue
+    }
+    if (maxLengthValue !== null) {
+      filters.max_length = maxLengthValue
     }
 
     try {
@@ -238,8 +261,6 @@ function App() {
       const text = await result.text()
       const data = text ? JSON.parse(text) : null
 
-      setHttpStatus(result.status)
-
       if (!result.ok) {
         setError(data?.detail ?? `Request failed with ${result.status}`)
         return
@@ -262,6 +283,10 @@ function App() {
     setTopK(defaultFilters.topK)
     setMinSr(defaultFilters.minSr)
     setMaxSr(defaultFilters.maxSr)
+    setMinBpm(defaultFilters.minBpm)
+    setMaxBpm(defaultFilters.maxBpm)
+    setMinLength(defaultFilters.minLength)
+    setMaxLength(defaultFilters.maxLength)
     setMinAr(defaultFilters.minAr)
     setMaxAr(defaultFilters.maxAr)
     setMinCs(defaultFilters.minCs)
@@ -272,8 +297,8 @@ function App() {
     setMaxHp(defaultFilters.maxHp)
     setStatus(defaultFilters.status)
     setExcludeSameSet(defaultFilters.excludeSameSet)
+    setAdvancedOpen(false)
     setError('')
-    setHttpStatus(null)
     setResponse(null)
     setCopiedBeatmapId(null)
   }
@@ -305,32 +330,15 @@ function App() {
             />
           </label>
 
-          <label className="field small-field">
-            <span>Rows</span>
-            <input
-              required
-              min="1"
-              max="50"
-              type="number"
-              value={topK}
-              onChange={(event) => setTopK(event.target.value)}
-            />
-          </label>
-
-          <button className="primary-button" type="submit" disabled={submitDisabled}>
-            {isLoading ? 'Searching' : 'Recommend'}
-          </button>
-          <button className="ghost-button" type="button" onClick={resetForm}>
-            Reset
-          </button>
-        </div>
-
-        <div className="filter-grid">
-          <RangeFields label="SR" min={minSr} max={maxSr} setMin={setMinSr} setMax={setMaxSr} />
-          <RangeFields label="AR" min={minAr} max={maxAr} setMin={setMinAr} setMax={setMaxAr} />
-          <RangeFields label="CS" min={minCs} max={maxCs} setMin={setMinCs} setMax={setMaxCs} />
-          <RangeFields label="OD" min={minOd} max={maxOd} setMin={setMinOd} setMax={setMaxOd} />
-          <RangeFields label="HP" min={minHp} max={maxHp} setMin={setMinHp} setMax={setMaxHp} />
+          <RangeFields label="Star" min={minSr} max={maxSr} setMin={setMinSr} setMax={setMaxSr} />
+          <RangeFields
+            label="Len"
+            min={minLength}
+            max={maxLength}
+            setMin={setMinLength}
+            setMax={setMaxLength}
+          />
+          <RangeFields label="BPM" min={minBpm} max={maxBpm} setMin={setMinBpm} setMax={setMaxBpm} />
 
           <label className="field status-field">
             <span>Status</span>
@@ -345,31 +353,60 @@ function App() {
             </select>
           </label>
 
-          <label className="check-field">
+          <label className="field small-field">
+            <span>Rows</span>
             <input
-              type="checkbox"
-              checked={excludeSameSet}
-              onChange={(event) => setExcludeSameSet(event.target.checked)}
+              required
+              inputMode="numeric"
+              pattern="[0-9]*"
+              type="text"
+              value={topK}
+              onChange={(event) => setTopK(event.target.value)}
             />
-            <span>Exclude same set</span>
           </label>
 
-          {turnstileSiteKey ? (
-            <div className="turnstile-hidden" ref={turnstileRef} />
-          ) : null}
+          <button
+            className="ghost-button advanced-toggle"
+            type="button"
+            aria-expanded={advancedOpen}
+            onClick={() => setAdvancedOpen((open) => !open)}
+          >
+            {advancedOpen ? 'Hide' : 'Stats'}
+            <span aria-hidden="true">{advancedOpen ? '-' : '+'}</span>
+          </button>
+          <button className="primary-button" type="submit" disabled={submitDisabled}>
+            {isLoading ? 'Searching' : 'Recommend'}
+          </button>
+          <button className="ghost-button" type="button" onClick={resetForm}>
+            Reset
+          </button>
         </div>
+
+        {advancedOpen ? (
+          <div className="advanced-filters">
+            <SliderRangeFields label="AR" min={minAr} max={maxAr} setMin={setMinAr} setMax={setMaxAr} />
+            <SliderRangeFields label="CS" min={minCs} max={maxCs} setMin={setMinCs} setMax={setMaxCs} />
+            <SliderRangeFields label="OD" min={minOd} max={maxOd} setMin={setMinOd} setMax={setMaxOd} />
+            <SliderRangeFields label="HP" min={minHp} max={maxHp} setMin={setMinHp} setMax={setMaxHp} />
+            <label className="check-field">
+              <input
+                type="checkbox"
+                checked={excludeSameSet}
+                onChange={(event) => setExcludeSameSet(event.target.checked)}
+              />
+              <span>Exclude same set</span>
+            </label>
+          </div>
+        ) : null}
+
+        {turnstileSiteKey ? (
+          <div className="turnstile-hidden" ref={turnstileRef} />
+        ) : null}
       </form>
 
       <section className="results-panel">
         <div className="results-heading">
-          <div>
-            <p className="eyebrow">results</p>
-            <h2>{response ? `${response.count} suggestions` : 'Ready when you are'}</h2>
-          </div>
-          <div className="status-line">
-            {httpStatus ? <span>HTTP {httpStatus}</span> : null}
-            {response ? <span>cache {response.query.cache}</span> : null}
-          </div>
+          <div className="results-badge">{resultsLabel(response)}</div>
         </div>
 
         {error ? <p className="error-text">{error}</p> : null}
@@ -388,11 +425,7 @@ function App() {
               ))}
             </div>
           </>
-        ) : (
-          <div className="empty-state">
-            <span>Paste a beatmap ID or link, tune the filters, then search.</span>
-          </div>
-        )}
+        ) : null}
       </section>
     </main>
   )
@@ -411,23 +444,68 @@ function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps) {
     <div className="range-field">
       <span>{label}</span>
       <input
-        min="0"
-        step="0.01"
-        type="number"
+        inputMode="decimal"
+        type="text"
         value={min}
         onChange={(event) => setMin(event.target.value)}
         placeholder="min"
         aria-label={`${label} minimum`}
       />
       <input
-        min="0"
-        step="0.01"
-        type="number"
+        inputMode="decimal"
+        type="text"
         value={max}
         onChange={(event) => setMax(event.target.value)}
         placeholder="max"
         aria-label={`${label} maximum`}
       />
+    </div>
+  )
+}
+
+function SliderRangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps) {
+  const minValue = sliderValue(min, 0)
+  const maxValue = sliderValue(max, 10)
+
+  return (
+    <div className="slider-field">
+      <div className="slider-top">
+        <span>{label}</span>
+        <strong>{min || 'any'} - {max || 'any'}</strong>
+      </div>
+      <label>
+        <span>Min</span>
+        <input
+          min="0"
+          max="10"
+          step="0.1"
+          type="range"
+          value={minValue}
+          onChange={(event) => setMin(clampSliderValue(event.target.value, 0, maxValue))}
+          aria-label={`${label} minimum`}
+        />
+      </label>
+      <label>
+        <span>Max</span>
+        <input
+          min="0"
+          max="10"
+          step="0.1"
+          type="range"
+          value={maxValue}
+          onChange={(event) => setMax(clampSliderValue(event.target.value, minValue, 10))}
+          aria-label={`${label} maximum`}
+        />
+      </label>
+      <button
+        type="button"
+        onClick={() => {
+          setMin('')
+          setMax('')
+        }}
+      >
+        Clear
+      </button>
     </div>
   )
 }
@@ -482,6 +560,20 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
           <span>{statusLabel(beatmap.status)}</span>
           {beatmap.score !== undefined ? <span>{beatmap.score.toFixed(3)} match</span> : null}
         </div>
+        <div className="row-actions">
+          <button
+            type="button"
+            className={copied ? 'copied-action' : ''}
+            onClick={() => onCopy(beatmap.beatmap_id)}
+            aria-label={copied ? 'Copied beatmap ID' : 'Copy beatmap ID'}
+            title={copied ? 'Copied' : 'Copy ID'}
+          >
+            <CopyIcon />
+          </button>
+          <a href={`osu://b/${beatmap.beatmap_id}`} aria-label="Download beatmap" title="Download">
+            <DownloadIcon />
+          </a>
+        </div>
       </div>
 
       <div className="stat-grid">
@@ -493,14 +585,23 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
         <Stat label="OD" value={formatNumber(beatmap.accuracy, 1)} />
         <Stat label="HP" value={formatNumber(beatmap.drain, 1)} />
       </div>
-
-      <div className="row-actions">
-        <button type="button" onClick={() => onCopy(beatmap.beatmap_id)}>
-          Copy ID
-        </button>
-        <a href={`osu://b/${beatmap.beatmap_id}`}>Download</a>
-      </div>
     </article>
+  )
+}
+
+function CopyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 7V5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h2Zm2 0h3a2 2 0 0 1 2 2v5h2V5h-7v2Zm-4 2v10h7V9H6Z" />
+    </svg>
+  )
+}
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M11 4h2v8.2l2.9-2.9 1.4 1.4L12 16l-5.3-5.3 1.4-1.4 2.9 2.9V4Zm-5 14h12v2H6v-2Z" />
+    </svg>
   )
 }
 
@@ -546,7 +647,30 @@ function parseBeatmapId(value: string): number | null {
 }
 
 function numericOrNull(value: string): number | null {
-  return value === '' ? null : Number(value)
+  if (value.trim() === '') {
+    return null
+  }
+
+  const number = Number(value)
+  return Number.isFinite(number) ? number : null
+}
+
+function sliderValue(value: string, fallback: number): number {
+  const number = Number(value)
+  return Number.isFinite(number) ? number : fallback
+}
+
+function clampSliderValue(value: string, min: number, max: number): string {
+  const number = Number(value)
+  return Math.min(max, Math.max(min, number)).toFixed(1)
+}
+
+function resultsLabel(response: RecommendResponse | null): string {
+  if (!response || response.count === 0) {
+    return 'NO RESULTS'
+  }
+
+  return `${response.count} RESULTS`
 }
 
 async function copyText(value: string) {
