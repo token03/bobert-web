@@ -365,15 +365,6 @@ function App() {
             />
           </label>
 
-          <button
-            className="ghost-button advanced-toggle"
-            type="button"
-            aria-expanded={advancedOpen}
-            onClick={() => setAdvancedOpen((open) => !open)}
-          >
-            {advancedOpen ? 'Hide' : 'Stats'}
-            <span aria-hidden="true">{advancedOpen ? '-' : '+'}</span>
-          </button>
           <button className="primary-button" type="submit" disabled={submitDisabled}>
             {isLoading ? 'Searching' : 'Recommend'}
           </button>
@@ -381,6 +372,16 @@ function App() {
             Reset
           </button>
         </div>
+
+        <button
+          className="advanced-toggle"
+          type="button"
+          aria-expanded={advancedOpen}
+          aria-label={advancedOpen ? 'Hide advanced stats' : 'Show advanced stats'}
+          onClick={() => setAdvancedOpen((open) => !open)}
+        >
+          <ChevronIcon open={advancedOpen} />
+        </button>
 
         {advancedOpen ? (
           <div className="advanced-filters">
@@ -518,14 +519,14 @@ type BeatmapSummaryProps = {
 function BeatmapSummary({ beatmap, count, label }: BeatmapSummaryProps) {
   return (
     <article className="source-card">
-      <div className="source-card-top">
+      <div className="source-main">
         <span>{label}</span>
-        <strong>{resultsLabel(count)}</strong>
+        <a href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
+          {displayArtist(beatmap)} - {displayTitle(beatmap)}
+        </a>
+        <small>{beatmap.version ?? 'Unknown difficulty'}</small>
       </div>
-      <a href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
-        {displayArtist(beatmap)} - {displayTitle(beatmap)}
-      </a>
-      <small>{beatmap.version ?? 'Unknown difficulty'}</small>
+      <strong>{resultsLabel(count)}</strong>
     </article>
   )
 }
@@ -557,11 +558,13 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
           </a>
           {copied ? <span className="copied-pill">Copied ID</span> : null}
         </div>
-        <div className="version-line">{beatmap.version ?? 'Unknown difficulty'}</div>
+        <div className="version-line">
+          <span>{beatmap.version ?? 'Unknown difficulty'}</span>
+          {beatmap.score !== undefined ? <span className="match-pill">{beatmap.score.toFixed(3)} match</span> : null}
+        </div>
         <div className="meta-line">
           <CreatorLink beatmap={beatmap} />
           <span>{statusLabel(beatmap.status)}</span>
-          {beatmap.score !== undefined ? <span>{beatmap.score.toFixed(3)} match</span> : null}
         </div>
         <div className="row-actions">
           <button type="button" aria-label="Play preview" title="Play preview">
@@ -583,15 +586,27 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
       </div>
 
       <div className="stat-strip">
-        <Stat label="Star" value={formatNumber(beatmap.stars, 2)} featured />
-        <Stat label="BPM" value={formatNumber(beatmap.bpm, 0)} featured />
-        <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
-        <Stat label="AR" value={formatNumber(beatmap.ar, 1)} />
-        <Stat label="CS" value={formatNumber(beatmap.cs, 1)} />
-        <Stat label="OD" value={formatNumber(beatmap.accuracy, 1)} />
-        <Stat label="HP" value={formatNumber(beatmap.drain, 1)} />
+        <div className="stat-row stat-row-main">
+          <Stat label="Star" value={formatNumber(beatmap.stars, 2)} featured />
+          <Stat label="BPM" value={formatNumber(beatmap.bpm, 0)} featured />
+          <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
+        </div>
+        <div className="stat-row stat-row-sub">
+          <Stat label="AR" value={formatNumber(beatmap.ar, 1)} />
+          <Stat label="CS" value={formatNumber(beatmap.cs, 1)} />
+          <Stat label="OD" value={formatNumber(beatmap.accuracy, 1)} />
+          <Stat label="HP" value={formatNumber(beatmap.drain, 1)} />
+        </div>
       </div>
     </article>
+  )
+}
+
+function ChevronIcon({ open }: { open: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d={open ? 'M6.7 15.3 12 10l5.3 5.3 1.4-1.4L12 7.2l-6.7 6.7 1.4 1.4Z' : 'm6.7 8.7-1.4 1.4 6.7 6.7 6.7-6.7-1.4-1.4L12 14 6.7 8.7Z'} />
+    </svg>
   )
 }
 
