@@ -365,11 +365,13 @@ function App() {
             />
           </label>
 
-          <button className="primary-button" type="submit" disabled={submitDisabled}>
-            {isLoading ? 'Searching' : 'Recommend'}
-          </button>
           <button className="ghost-button" type="button" onClick={resetForm}>
-            Reset
+            <RefreshIcon />
+            <span className="sr-only">Reset</span>
+          </button>
+          <button className="primary-button" type="submit" disabled={submitDisabled} aria-label="Recommend">
+            {isLoading ? <SpinnerIcon /> : <SearchIcon />}
+            <span className="sr-only">Recommend</span>
           </button>
         </div>
 
@@ -551,51 +553,53 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
         )}
       </a>
 
-      <div className="map-main">
-        <div className="title-line">
-          <a className="map-title" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
-            {displayArtist(beatmap)} - {displayTitle(beatmap)}
-          </a>
-          {copied ? <span className="copied-pill">Copied ID</span> : null}
+      <div className="map-content">
+        <div className="map-main">
+          <div className="title-line">
+            <a className="map-title" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
+              {displayArtist(beatmap)} - {displayTitle(beatmap)}
+            </a>
+            {copied ? <span className="copied-pill">Copied ID</span> : null}
+          </div>
+          <div className="version-line">
+            <span>{beatmap.version ?? 'Unknown difficulty'}</span>
+            {beatmap.score !== undefined ? <span className="match-pill">{beatmap.score.toFixed(3)} match</span> : null}
+          </div>
+          <div className="meta-line">
+            <CreatorLink beatmap={beatmap} />
+            <span>{statusLabel(beatmap.status)}</span>
+          </div>
+          <div className="row-actions">
+            <button type="button" aria-label="Play preview" title="Play preview">
+              <PlayIcon />
+            </button>
+            <button
+              type="button"
+              className={copied ? 'copied-action' : ''}
+              onClick={() => onCopy(beatmap.beatmap_id)}
+              aria-label={copied ? 'Copied beatmap ID' : 'Copy beatmap ID'}
+              title={copied ? 'Copied' : 'Copy ID'}
+            >
+              <CopyIcon />
+            </button>
+            <a href={`osu://b/${beatmap.beatmap_id}`} aria-label="Download beatmap" title="Download">
+              <DownloadIcon />
+            </a>
+          </div>
         </div>
-        <div className="version-line">
-          <span>{beatmap.version ?? 'Unknown difficulty'}</span>
-          {beatmap.score !== undefined ? <span className="match-pill">{beatmap.score.toFixed(3)} match</span> : null}
-        </div>
-        <div className="meta-line">
-          <CreatorLink beatmap={beatmap} />
-          <span>{statusLabel(beatmap.status)}</span>
-        </div>
-        <div className="row-actions">
-          <button type="button" aria-label="Play preview" title="Play preview">
-            <PlayIcon />
-          </button>
-          <button
-            type="button"
-            className={copied ? 'copied-action' : ''}
-            onClick={() => onCopy(beatmap.beatmap_id)}
-            aria-label={copied ? 'Copied beatmap ID' : 'Copy beatmap ID'}
-            title={copied ? 'Copied' : 'Copy ID'}
-          >
-            <CopyIcon />
-          </button>
-          <a href={`osu://b/${beatmap.beatmap_id}`} aria-label="Download beatmap" title="Download">
-            <DownloadIcon />
-          </a>
-        </div>
-      </div>
 
-      <div className="stat-strip">
-        <div className="stat-row stat-row-main">
-          <Stat label="Star" value={formatNumber(beatmap.stars, 2)} featured />
-          <Stat label="BPM" value={formatNumber(beatmap.bpm, 0)} featured />
-          <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
-        </div>
-        <div className="stat-row stat-row-sub">
-          <Stat label="AR" value={formatNumber(beatmap.ar, 1)} />
-          <Stat label="CS" value={formatNumber(beatmap.cs, 1)} />
-          <Stat label="OD" value={formatNumber(beatmap.accuracy, 1)} />
-          <Stat label="HP" value={formatNumber(beatmap.drain, 1)} />
+        <div className="stat-strip">
+          <div className="stat-row stat-row-main">
+            <Stat label="Star" value={formatNumber(beatmap.stars, 2)} featured />
+            <Stat label="BPM" value={formatNumber(beatmap.bpm, 0)} featured />
+            <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
+          </div>
+          <div className="stat-row stat-row-sub">
+            <Stat label="AR" value={formatNumber(beatmap.ar, 1)} />
+            <Stat label="CS" value={formatNumber(beatmap.cs, 1)} />
+            <Stat label="OD" value={formatNumber(beatmap.accuracy, 1)} />
+            <Stat label="HP" value={formatNumber(beatmap.drain, 1)} />
+          </div>
         </div>
       </div>
     </article>
@@ -630,6 +634,30 @@ function DownloadIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M11 4h2v8.2l2.9-2.9 1.4 1.4L12 16l-5.3-5.3 1.4-1.4 2.9 2.9V4Zm-5 14h12v2H6v-2Z" />
+    </svg>
+  )
+}
+
+function RefreshIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M17.7 6.3A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.8-4.3L13 11h8V3l-3.3 3.3Z" />
+    </svg>
+  )
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M10.5 4a6.5 6.5 0 0 1 5.2 10.4l4 4-1.4 1.4-4-4A6.5 6.5 0 1 1 10.5 4Zm0 2a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Z" />
+    </svg>
+  )
+}
+
+function SpinnerIcon() {
+  return (
+    <svg className="spinner-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Z" />
     </svg>
   )
 }
