@@ -332,7 +332,7 @@ function App() {
 
           <RangeFields label="Star" min={minSr} max={maxSr} setMin={setMinSr} setMax={setMaxSr} />
           <RangeFields
-            label="Len"
+            label="Length"
             min={minLength}
             max={maxLength}
             setMin={setMinLength}
@@ -595,10 +595,10 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
             <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
           </div>
           <div className="stat-row stat-row-sub">
-            <Stat label="AR" value={formatNumber(beatmap.ar, 1)} />
-            <Stat label="CS" value={formatNumber(beatmap.cs, 1)} />
-            <Stat label="OD" value={formatNumber(beatmap.accuracy, 1)} />
-            <Stat label="HP" value={formatNumber(beatmap.drain, 1)} />
+            <Stat label="AR" value={formatFixedNumber(beatmap.ar, 1)} />
+            <Stat label="CS" value={formatFixedNumber(beatmap.cs, 1)} />
+            <Stat label="OD" value={formatFixedNumber(beatmap.accuracy, 1)} />
+            <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
           </div>
         </div>
       </div>
@@ -767,6 +767,13 @@ function formatNumber(value: number | null, digits: number): string {
     return '-'
   }
   return value.toFixed(digits).replace(/\.0+$/, '')
+}
+
+function formatFixedNumber(value: number | null, digits: number): string {
+  if (value === null || Number.isNaN(value)) {
+    return '-'
+  }
+  return value.toFixed(digits)
 }
 
 function formatLength(value: number | null): string {
