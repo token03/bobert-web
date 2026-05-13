@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { CSSProperties, FormEvent } from 'react'
 import './App.css'
 
 type Turnstile = {
@@ -67,14 +67,14 @@ const defaultFilters = {
   maxBpm: '',
   minLength: '',
   maxLength: '',
-  minAr: '',
-  maxAr: '',
-  minCs: '',
-  maxCs: '',
-  minOd: '',
-  maxOd: '',
-  minHp: '',
-  maxHp: '',
+  minAr: '0',
+  maxAr: '10',
+  minCs: '0',
+  maxCs: '10',
+  minOd: '0',
+  maxOd: '10',
+  minHp: '0',
+  maxHp: '10',
   status: '',
   excludeSameSet: true,
 }
@@ -405,15 +405,11 @@ function App() {
       </form>
 
       <section className="results-panel">
-        <div className="results-heading">
-          <div className="results-badge">{resultsLabel(response)}</div>
-        </div>
-
         {error ? <p className="error-text">{error}</p> : null}
 
         {response ? (
           <>
-            <BeatmapSummary beatmap={response.query.metadata} label="Source map" />
+            <BeatmapSummary beatmap={response.query.metadata} count={response.count} label="Source map" />
             <div className="result-list">
               {response.results.map((beatmap) => (
                 <BeatmapRow
@@ -466,15 +462,16 @@ function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps) {
 function SliderRangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps) {
   const minValue = sliderValue(min, 0)
   const maxValue = sliderValue(max, 10)
+  const left = `${minValue * 10}%`
+  const right = `${100 - maxValue * 10}%`
 
   return (
     <div className="slider-field">
       <div className="slider-top">
         <span>{label}</span>
-        <strong>{min || 'any'} - {max || 'any'}</strong>
+        <strong>{minValue.toFixed(1)} - {maxValue.toFixed(1)}</strong>
       </div>
-      <label>
-        <span>Min</span>
+      <div className="dual-slider" style={{ '--range-left': left, '--range-right': right } as SliderStyle}>
         <input
           min="0"
           max="10"
@@ -484,9 +481,6 @@ function SliderRangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps
           onChange={(event) => setMin(clampSliderValue(event.target.value, 0, maxValue))}
           aria-label={`${label} minimum`}
         />
-      </label>
-      <label>
-        <span>Max</span>
         <input
           min="0"
           max="10"
@@ -496,29 +490,38 @@ function SliderRangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps
           onChange={(event) => setMax(clampSliderValue(event.target.value, minValue, 10))}
           aria-label={`${label} maximum`}
         />
-      </label>
+      </div>
       <button
         type="button"
         onClick={() => {
-          setMin('')
-          setMax('')
+          setMin('0')
+          setMax('10')
         }}
       >
-        Clear
+        Reset
       </button>
     </div>
   )
 }
 
+type SliderStyle = CSSProperties & {
+  '--range-left': string
+  '--range-right': string
+}
+
 type BeatmapSummaryProps = {
   beatmap: BeatmapMetadata
+  count: number
   label: string
 }
 
-function BeatmapSummary({ beatmap, label }: BeatmapSummaryProps) {
+function BeatmapSummary({ beatmap, count, label }: BeatmapSummaryProps) {
   return (
     <article className="source-card">
-      <span>{label}</span>
+      <div className="source-card-top">
+        <span>{label}</span>
+        <strong>{resultsLabel(count)}</strong>
+      </div>
       <a href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
         {displayArtist(beatmap)} - {displayTitle(beatmap)}
       </a>
@@ -561,6 +564,9 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
           {beatmap.score !== undefined ? <span>{beatmap.score.toFixed(3)} match</span> : null}
         </div>
         <div className="row-actions">
+          <button type="button" aria-label="Play preview" title="Play preview">
+            <PlayIcon />
+          </button>
           <button
             type="button"
             className={copied ? 'copied-action' : ''}
@@ -576,16 +582,24 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
         </div>
       </div>
 
-      <div className="stat-grid">
-        <Stat label="Star" value={formatNumber(beatmap.stars, 2)} />
-        <Stat label="BPM" value={formatNumber(beatmap.bpm, 0)} />
-        <Stat label="Len" value={formatLength(beatmap.total_length)} />
+      <div className="stat-strip">
+        <Stat label="Star" value={formatNumber(beatmap.stars, 2)} featured />
+        <Stat label="BPM" value={formatNumber(beatmap.bpm, 0)} featured />
+        <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
         <Stat label="AR" value={formatNumber(beatmap.ar, 1)} />
         <Stat label="CS" value={formatNumber(beatmap.cs, 1)} />
         <Stat label="OD" value={formatNumber(beatmap.accuracy, 1)} />
         <Stat label="HP" value={formatNumber(beatmap.drain, 1)} />
       </div>
     </article>
+  )
+}
+
+function PlayIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 5v14l11-7L8 5Z" />
+    </svg>
   )
 }
 
@@ -606,13 +620,14 @@ function DownloadIcon() {
 }
 
 type StatProps = {
+  featured?: boolean
   label: string
   value: string
 }
 
-function Stat({ label, value }: StatProps) {
+function Stat({ featured = false, label, value }: StatProps) {
   return (
-    <div className="stat-cell">
+    <div className={featured ? 'stat-item featured-stat' : 'stat-item'}>
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
@@ -637,12 +652,15 @@ function parseBeatmapId(value: string): number | null {
     return null
   }
 
-  const match = trimmed.match(/(\d+)\/?(?:[?#].*)?$/)
-  if (!match) {
+  const urlMatch = trimmed.match(/^https?:\/\/[^/?#]+([^?#]*)(?:\?[^#]*)?(#.*)?$/i)
+  const searchable = urlMatch ? `${urlMatch[1]}${urlMatch[2] ?? ''}` : trimmed
+
+  const matches = [...searchable.matchAll(/(?:^|[/#])(\d+)(?=$|[/#])/g)]
+  if (matches.length === 0) {
     return null
   }
 
-  const id = Number(match[1])
+  const id = Number(matches[matches.length - 1][1])
   return Number.isSafeInteger(id) && id > 0 ? id : null
 }
 
@@ -665,12 +683,8 @@ function clampSliderValue(value: string, min: number, max: number): string {
   return Math.min(max, Math.max(min, number)).toFixed(1)
 }
 
-function resultsLabel(response: RecommendResponse | null): string {
-  if (!response || response.count === 0) {
-    return 'NO RESULTS'
-  }
-
-  return `${response.count} RESULTS`
+function resultsLabel(count: number): string {
+  return `${count} RESULTS`
 }
 
 async function copyText(value: string) {
