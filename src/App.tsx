@@ -12,9 +12,12 @@ type Turnstile = {
       'error-callback': () => void
       theme?: 'light' | 'dark' | 'auto'
       size?: 'normal' | 'compact' | 'flexible'
+      appearance?: 'always' | 'execute' | 'interaction-only'
+      execution?: 'render' | 'execute'
     },
   ) => string
   reset: (widgetId: string) => void
+  execute: (widgetId: string) => void
 }
 
 type BeatmapMetadata = {
@@ -76,6 +79,8 @@ function App() {
   const turnstileRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
   const copyTimeoutRef = useRef<number | null>(null)
+  const pendingTurnstileResolveRef = useRef<((token: string) => void) | null>(null)
+  const pendingTurnstileRejectRef = useRef<((error: Error) => void) | null>(null)
   const [beatmapInput, setBeatmapInput] = useState('')
   const [topK, setTopK] = useState(defaultFilters.topK)
   const [minSr, setMinSr] = useState(defaultFilters.minSr)
@@ -90,9 +95,7 @@ function App() {
   const [maxHp, setMaxHp] = useState(defaultFilters.maxHp)
   const [status, setStatus] = useState(defaultFilters.status)
   const [excludeSameSet, setExcludeSameSet] = useState(defaultFilters.excludeSameSet)
-  const [apiKey, setApiKey] = useState('')
-  const [turnstileToken, setTurnstileToken] = useState('')
-  const [turnstileStatus, setTurnstileStatus] = useState(
+  const [, setTurnstileStatus] = useState(
     turnstileSiteKey ? 'waiting' : 'disabled',
   )
   const [isLoading, setIsLoading] = useState(false)
@@ -113,19 +116,25 @@ function App() {
 
       widgetIdRef.current = window.turnstile.render(turnstileRef.current, {
         sitekey: turnstileSiteKey,
-        theme: 'dark',
-        size: 'compact',
+        appearance: 'execute',
+        execution: 'execute',
         callback: (token) => {
-          setTurnstileToken(token)
           setTurnstileStatus('ready')
+          pendingTurnstileResolveRef.current?.(token)
+          pendingTurnstileResolveRef.current = null
+          pendingTurnstileRejectRef.current = null
         },
         'expired-callback': () => {
-          setTurnstileToken('')
           setTurnstileStatus('expired')
+          pendingTurnstileRejectRef.current?.(new Error('Turnstile challenge expired.'))
+          pendingTurnstileResolveRef.current = null
+          pendingTurnstileRejectRef.current = null
         },
         'error-callback': () => {
-          setTurnstileToken('')
           setTurnstileStatus('error')
+          pendingTurnstileRejectRef.current?.(new Error('Turnstile verification failed.'))
+          pendingTurnstileResolveRef.current = null
+          pendingTurnstileRejectRef.current = null
         },
       })
       return true
@@ -146,6 +155,23 @@ function App() {
       script.onload = null
     }
   }, [])
+
+  function getTurnstileToken(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const widgetId = widgetIdRef.current
+
+      if (!window.turnstile || !widgetId) {
+        reject(new Error('Turnstile is not ready yet.'))
+        return
+      }
+
+      pendingTurnstileResolveRef.current = resolve
+      pendingTurnstileRejectRef.current = reject
+      setTurnstileStatus('checking')
+
+      window.turnstile.execute(widgetId)
+    })
+  }
 
   useEffect(() => {
     return () => {
@@ -171,15 +197,6 @@ function App() {
     setResponse(null)
     setHttpStatus(null)
 
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    }
-    if (apiKey.trim()) {
-      headers['X-API-Key'] = apiKey.trim()
-    } else if (turnstileToken) {
-      headers['X-Turnstile-Token'] = turnstileToken
-    }
-
     const filters = {
       min_sr: numericOrNull(minSr),
       max_sr: numericOrNull(maxSr),
@@ -196,6 +213,19 @@ function App() {
     }
 
     try {
+      let token = ''
+
+      if (turnstileSiteKey) {
+        token = await getTurnstileToken()
+      }
+
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['X-Turnstile-Token'] = token
+      }
+
       const result = await fetch(`${apiUrl}/recommend`, {
         method: 'POST',
         headers,
@@ -222,7 +252,6 @@ function App() {
       setIsLoading(false)
       if (widgetIdRef.current && window.turnstile) {
         window.turnstile.reset(widgetIdRef.current)
-        setTurnstileToken('')
         setTurnstileStatus('waiting')
       }
     }
@@ -260,20 +289,10 @@ function App() {
     }, 1400)
   }
 
-  const turnstileNeeded = Boolean(turnstileSiteKey && !apiKey.trim())
-  const submitDisabled = isLoading || (turnstileNeeded && !turnstileToken)
+  const submitDisabled = isLoading
 
   return (
     <main className="app-shell">
-      <section className="hero-panel">
-        <p className="eyebrow">bobert</p>
-        <h1>osu! beatmap recommendations</h1>
-        <p className="hero-copy">
-          Find maps that feel structurally similar, tuned with osu! pink and a quiet
-          close-to-black workspace.
-        </p>
-      </section>
-
       <form className="control-panel" onSubmit={submitRecommend}>
         <div className="primary-controls">
           <label className="field beatmap-field">
@@ -315,22 +334,15 @@ function App() {
 
           <label className="field status-field">
             <span>Status</span>
-            <input
-              maxLength={32}
+            <select
               value={status}
               onChange={(event) => setStatus(event.target.value)}
-              placeholder="ranked, loved, 1, 3"
-            />
-          </label>
-
-          <label className="field api-key-field">
-            <span>API key</span>
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(event) => setApiKey(event.target.value)}
-              placeholder="optional"
-            />
+            >
+              <option value="">Any</option>
+              <option value="ranked">Ranked</option>
+              <option value="loved">Loved</option>
+              <option value="graveyard">Graveyard</option>
+            </select>
           </label>
 
           <label className="check-field">
@@ -342,11 +354,8 @@ function App() {
             <span>Exclude same set</span>
           </label>
 
-          {turnstileNeeded ? (
-            <div className="turnstile-block">
-              <div ref={turnstileRef} />
-              <span>Turnstile {turnstileStatus}</span>
-            </div>
+          {turnstileSiteKey ? (
+            <div className="turnstile-hidden" ref={turnstileRef} />
           ) : null}
         </div>
       </form>
@@ -453,10 +462,6 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
         {beatmap.beatmapset_id ? (
           <img
             src={coverUrl(beatmap.beatmapset_id)}
-            srcSet={`${coverUrl(beatmap.beatmapset_id)} 1x, ${coverUrl(
-              beatmap.beatmapset_id,
-              true,
-            )} 2x`}
             alt=""
           />
         ) : (

@@ -1,16 +1,6 @@
 .app-shell {
-  width: min(100%, 1280px);
-  margin: 0 auto;
-  padding: 32px 20px 56px;
-}
-
-.hero-panel {
-  margin-bottom: 18px;
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  background: var(--panel);
-  padding: 30px;
-  box-shadow: var(--shadow);
+  width: 100%;
+  padding: 10px 12px 32px;
 }
 
 .eyebrow {
@@ -22,23 +12,17 @@
   text-transform: uppercase;
 }
 
-.hero-copy {
-  max-width: 620px;
-  color: var(--muted);
-  font-size: 17px;
-}
-
 .control-panel {
   position: sticky;
-  top: 12px;
+  top: 8px;
   z-index: 20;
   display: grid;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 10px;
+  margin-bottom: 12px;
   border: 1px solid var(--border-strong);
-  border-radius: 24px;
+  border-radius: 18px;
   background: var(--panel-solid);
-  padding: 16px;
+  padding: 12px;
   box-shadow: var(--shadow);
 }
 
@@ -81,7 +65,8 @@
   grid-column: 1 / -1;
 }
 
-input {
+input,
+select {
   width: 100%;
   min-height: 40px;
   border: 1px solid var(--border);
@@ -97,7 +82,8 @@ input::placeholder {
   color: var(--muted-soft);
 }
 
-input:focus {
+input:focus,
+select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
@@ -160,20 +146,20 @@ button:disabled {
   color: var(--accent-light);
 }
 
-.turnstile-block {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 182px;
-  color: var(--muted);
-  font-size: 12px;
+.turnstile-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .results-panel {
   border: 1px solid var(--border);
-  border-radius: 28px;
+  border-radius: 18px;
   background: var(--panel);
-  padding: 18px;
+  padding: 12px;
   box-shadow: var(--shadow);
 }
 
@@ -264,7 +250,7 @@ button:disabled {
 .beatmap-row {
   position: relative;
   display: grid;
-  grid-template-columns: 180px minmax(260px, 1fr) minmax(430px, 0.95fr);
+  grid-template-columns: 150px minmax(260px, 1fr) minmax(430px, 0.95fr);
   gap: 16px;
   align-items: center;
   min-height: 96px;
@@ -283,7 +269,7 @@ button:disabled {
 
 .cover-link {
   display: block;
-  height: 76px;
+  height: 150px;
   overflow: hidden;
   border-radius: 14px;
   background: var(--surface);
@@ -452,18 +438,16 @@ button:disabled {
 
 @media (max-width: 760px) {
   .app-shell {
-    padding: 18px 12px 36px;
-  }
-
-  .hero-panel,
-  .results-panel {
-    border-radius: 22px;
-    padding: 18px;
+    padding: 8px 8px 24px;
   }
 
   .control-panel {
     position: static;
-    border-radius: 20px;
+    border-radius: 16px;
+  }
+
+  .results-panel {
+    border-radius: 16px;
   }
 
   .primary-controls,
@@ -471,10 +455,9 @@ button:disabled {
     grid-template-columns: 1fr 1fr;
   }
 
-  .beatmap-field,
-  .status-field,
-  .api-key-field,
-  .turnstile-block {
+    .beatmap-field,
+    .status-field,
+  .status-field {
     grid-column: 1 / -1;
   }
 
