@@ -568,6 +568,7 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
             <CreatorLink beatmap={beatmap} />
             <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
           </div>
+          {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)}</span> : null}
         </div>
 
         <div className="stat-strip">
@@ -577,7 +578,6 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
             <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
           </div>
           <div className="stat-side">
-            {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)}</span> : null}
             <div className="stat-row stat-row-sub">
               <Stat label="AR" value={formatFixedNumber(beatmap.ar, 1)} />
               <Stat label="CS" value={formatFixedNumber(beatmap.cs, 1)} />
