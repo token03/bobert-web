@@ -539,11 +539,10 @@ function BeatmapRow({ beatmap, onCopy }: BeatmapRowProps) {
             <div className="artist-line">by {displayArtist(beatmap)}</div>
             <div className="version-line">
               <span>{beatmap.version ?? 'Unknown difficulty'}</span>
-              <span aria-hidden="true">|</span>
-              <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
             </div>
             <div className="match-line">
               {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)}</span> : null}
+              <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
               <CreatorLink beatmap={beatmap} />
             </div>
           </div>
@@ -659,12 +658,12 @@ function CreatorLink({ beatmap }: { beatmap: BeatmapMetadata }) {
   if (beatmap.creator_id) {
     return (
       <a href={`https://osu.ppy.sh/users/${beatmap.creator_id}`} target="_blank" rel="noreferrer">
-        mapped by {beatmap.creator ?? beatmap.creator_id}
+        by {beatmap.creator ?? beatmap.creator_id}
       </a>
     )
   }
 
-  return <span>mapped by {beatmap.creator ?? 'unknown'}</span>
+  return <span>by {beatmap.creator ?? 'unknown'}</span>
 }
 
 function parseBeatmapId(value: string): number | null {
