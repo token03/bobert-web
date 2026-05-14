@@ -60,7 +60,7 @@ const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ''
 
 const defaultFilters = {
-  topK: '60',
+  topK: '40',
   minSr: '',
   maxSr: '',
   minBpm: '',
@@ -658,12 +658,12 @@ function CreatorLink({ beatmap }: { beatmap: BeatmapMetadata }) {
   if (beatmap.creator_id) {
     return (
       <a href={`https://osu.ppy.sh/users/${beatmap.creator_id}`} target="_blank" rel="noreferrer">
-        by {beatmap.creator ?? beatmap.creator_id}
+        mapped by {beatmap.creator ?? beatmap.creator_id}
       </a>
     )
   }
 
-  return <span>by {beatmap.creator ?? 'unknown'}</span>
+  return <span>mapped by {beatmap.creator ?? 'unknown'}</span>
 }
 
 function parseBeatmapId(value: string): number | null {
