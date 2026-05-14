@@ -365,14 +365,16 @@ function App() {
             />
           </label>
 
-          <button className="ghost-button" type="button" onClick={resetForm}>
-            <RefreshIcon />
-            <span className="sr-only">Reset</span>
-          </button>
-          <button className="primary-button" type="submit" disabled={submitDisabled} aria-label="Recommend">
-            {isLoading ? <SpinnerIcon /> : <SearchIcon />}
-            <span className="sr-only">Recommend</span>
-          </button>
+          <div className="form-actions">
+            <button className="ghost-button" type="button" onClick={resetForm}>
+              <RefreshIcon />
+              <span className="sr-only">Reset</span>
+            </button>
+            <button className="primary-button" type="submit" disabled={submitDisabled} aria-label="Recommend">
+              {isLoading ? <SpinnerIcon /> : <SearchIcon />}
+              <span className="sr-only">Recommend</span>
+            </button>
+          </div>
         </div>
 
         <button
