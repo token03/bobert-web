@@ -568,24 +568,6 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
             <CreatorLink beatmap={beatmap} />
             <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
           </div>
-          <div className="row-actions">
-            {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)} match</span> : null}
-            <button type="button" aria-label="Play preview" title="Play preview">
-              <PlayIcon />
-            </button>
-            <button
-              type="button"
-              className={copied ? 'copied-action' : ''}
-              onClick={() => onCopy(beatmap.beatmap_id)}
-              aria-label={copied ? 'Copied beatmap ID' : 'Copy beatmap ID'}
-              title={copied ? 'Copied' : 'Copy ID'}
-            >
-              <CopyIcon />
-            </button>
-            <a href={`osu://b/${beatmap.beatmap_id}`} aria-label="Download beatmap" title="Download">
-              <DownloadIcon />
-            </a>
-          </div>
         </div>
 
         <div className="stat-strip">
@@ -594,11 +576,31 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
             <Stat label="BPM" value={formatNumber(beatmap.bpm, 0)} featured />
             <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
           </div>
-          <div className="stat-row stat-row-sub">
-            <Stat label="AR" value={formatFixedNumber(beatmap.ar, 1)} />
-            <Stat label="CS" value={formatFixedNumber(beatmap.cs, 1)} />
-            <Stat label="OD" value={formatFixedNumber(beatmap.accuracy, 1)} />
-            <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
+          <div className="stat-side">
+            {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)}</span> : null}
+            <div className="stat-row stat-row-sub">
+              <Stat label="AR" value={formatFixedNumber(beatmap.ar, 1)} />
+              <Stat label="CS" value={formatFixedNumber(beatmap.cs, 1)} />
+              <Stat label="OD" value={formatFixedNumber(beatmap.accuracy, 1)} />
+              <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
+            </div>
+            <div className="row-actions">
+              <button type="button" aria-label="Play preview" title="Play preview">
+                <PlayIcon />
+              </button>
+              <button
+                type="button"
+                className={copied ? 'copied-action' : ''}
+                onClick={() => onCopy(beatmap.beatmap_id)}
+                aria-label={copied ? 'Copied beatmap ID' : 'Copy beatmap ID'}
+                title={copied ? 'Copied' : 'Copy ID'}
+              >
+                <CopyIcon />
+              </button>
+              <a href={`osu://b/${beatmap.beatmap_id}`} aria-label="Download beatmap" title="Download">
+                <DownloadIcon />
+              </a>
+            </div>
           </div>
         </div>
       </div>
