@@ -461,7 +461,7 @@ button:disabled {
 
 .map-content {
   display: grid;
-  grid-template-columns: minmax(0, 0.72fr) minmax(188px, 0.92fr);
+  grid-template-columns: minmax(0, 0.76fr) minmax(198px, 0.86fr);
   align-items: center;
   gap: 12px;
   min-width: 0;
@@ -568,12 +568,11 @@ button:disabled {
 }
 
 .stat-strip {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 7px 10px;
-  min-width: 188px;
+  gap: 14px;
+  min-width: 198px;
 }
 
 .stat-row {
@@ -583,38 +582,35 @@ button:disabled {
 }
 
 .stat-row-main {
-  grid-column: 1 / -1;
-  gap: 8px;
-  justify-content: space-between;
+  gap: 6px;
 }
 
 .stat-row-sub {
-  flex-direction: row;
+  flex-direction: column;
   align-items: stretch;
-  gap: 8px;
+  gap: 7px;
 }
 
 .stat-side {
-  display: contents;
-}
-
-.stat-row-sub {
-  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .row-actions {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 5px;
 }
 
 .stat-row-sub .stat-item {
-  grid-template-columns: auto;
+  grid-template-columns: auto auto;
   align-items: baseline;
   justify-content: start;
-  gap: 1px;
+  gap: 5px;
   min-width: 0;
-  text-align: center;
+  text-align: left;
 }
 
 .stat-item {
@@ -646,7 +642,7 @@ button:disabled {
 
 .featured-stat strong {
   color: var(--heading);
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 900;
   letter-spacing: -0.03em;
 }
@@ -707,7 +703,7 @@ button:disabled {
   }
 }
 
-@media (max-width: 1320px) {
+@media (max-width: 1420px) {
   .result-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
