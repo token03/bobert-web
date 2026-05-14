@@ -214,7 +214,7 @@ function App() {
       max_accuracy: numericOrNull(maxOd),
       min_drain: numericOrNull(minHp),
       max_drain: numericOrNull(maxHp),
-      status: status.trim() || null,
+      status: numericOrNull(status),
       exclude_same_set: excludeSameSet,
     }
     const minBpmValue = numericOrNull(minBpm)
@@ -347,9 +347,13 @@ function App() {
               onChange={(event) => setStatus(event.target.value)}
             >
               <option value="">Any</option>
-              <option value="ranked">Ranked</option>
-              <option value="loved">Loved</option>
-              <option value="graveyard">Graveyard</option>
+              <option value="-2">Graveyard</option>
+              <option value="-1">WIP</option>
+              <option value="0">Pending</option>
+              <option value="1">Ranked</option>
+              <option value="2">Approved</option>
+              <option value="3">Qualified</option>
+              <option value="4">Loved</option>
             </select>
           </label>
 
