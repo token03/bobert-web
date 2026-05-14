@@ -64,8 +64,7 @@
 
 .field span,
 .range-field > span,
-.slider-top span,
-.slider-field label span {
+.slider-label {
   color: var(--muted);
   font-size: 11px;
   font-weight: 800;
@@ -232,38 +231,20 @@ button:disabled {
 }
 
 .slider-field {
+  grid-template-columns: auto auto minmax(76px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface);
-  padding: 10px;
+  padding: 9px 10px;
 }
 
-.slider-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.slider-top strong {
+.slider-field strong {
   color: var(--text);
   font-size: 12px;
   font-weight: 850;
   white-space: nowrap;
-}
-
-.slider-field button {
-  min-height: 28px;
-  border: 1px solid var(--border);
-  background: var(--surface-strong);
-  color: var(--muted);
-  font-size: 11px;
-  padding: 5px 8px;
-}
-
-.slider-field button:hover {
-  border-color: var(--accent-muted);
-  color: var(--accent-light);
 }
 
 .dual-slider {

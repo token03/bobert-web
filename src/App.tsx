@@ -457,10 +457,8 @@ function SliderRangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps
 
   return (
     <div className="slider-field">
-      <div className="slider-top">
-        <span>{label}</span>
-        <strong>{minValue.toFixed(1)} - {maxValue.toFixed(1)}</strong>
-      </div>
+      <span className="slider-label">{label}</span>
+      <strong>{minValue.toFixed(1)}</strong>
       <div className="dual-slider" style={{ '--range-left': left, '--range-right': right } as SliderStyle}>
         <input
           min="0"
@@ -481,15 +479,7 @@ function SliderRangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps
           aria-label={`${label} maximum`}
         />
       </div>
-      <button
-        type="button"
-        onClick={() => {
-          setMin('0')
-          setMax('10')
-        }}
-      >
-        Reset
-      </button>
+      <strong>{maxValue.toFixed(1)}</strong>
     </div>
   )
 }
