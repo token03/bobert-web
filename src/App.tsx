@@ -60,7 +60,7 @@ const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ''
 
 const defaultFilters = {
-  topK: '50',
+  topK: '60',
   minSr: '',
   maxSr: '',
   minBpm: '',
