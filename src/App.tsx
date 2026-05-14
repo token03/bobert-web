@@ -530,21 +530,23 @@ function BeatmapRow({ beatmap, onCopy }: BeatmapRowProps) {
       </a>
 
       <div className="map-content">
-        <div className="map-main">
-          <div className="title-line">
-            <a className="map-title" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
-              {displayArtist(beatmap)} - {displayTitle(beatmap)}
-            </a>
+          <div className="map-main">
+            <div className="title-line">
+              <a className="map-title" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
+                {displayTitle(beatmap)}
+              </a>
+            </div>
+            <div className="artist-line">by {displayArtist(beatmap)}</div>
+            <div className="version-line">
+              <span>{beatmap.version ?? 'Unknown difficulty'}</span>
+              <span aria-hidden="true">|</span>
+              <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
+            </div>
+            <div className="match-line">
+              {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)}</span> : null}
+              <CreatorLink beatmap={beatmap} />
+            </div>
           </div>
-          <div className="version-line">
-            <span>{beatmap.version ?? 'Unknown difficulty'}</span>
-          </div>
-          <div className="meta-line">
-            <CreatorLink beatmap={beatmap} />
-            <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
-          </div>
-          {beatmap.score !== undefined ? <span className="match-pill">{formatMatch(beatmap.score)}</span> : null}
-        </div>
 
         <div className="stat-strip">
           <div className="stat-row stat-row-main">
