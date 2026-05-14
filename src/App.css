@@ -22,9 +22,6 @@
 }
 
 .control-panel {
-  position: sticky;
-  top: 8px;
-  z-index: 20;
   display: grid;
   gap: 10px;
   margin-bottom: 12px;
