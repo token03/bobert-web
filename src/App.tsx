@@ -82,7 +82,6 @@ const defaultFilters = {
 function App() {
   const turnstileRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
-  const copyTimeoutRef = useRef<number | null>(null)
   const pendingTurnstileResolveRef = useRef<((token: string) => void) | null>(null)
   const pendingTurnstileRejectRef = useRef<((error: Error) => void) | null>(null)
   const [beatmapInput, setBeatmapInput] = useState('')
@@ -110,7 +109,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [response, setResponse] = useState<RecommendResponse | null>(null)
-  const [copiedBeatmapId, setCopiedBeatmapId] = useState<number | null>(null)
 
   useEffect(() => {
     if (!turnstileSiteKey || !turnstileRef.current || widgetIdRef.current) {
@@ -180,14 +178,6 @@ function App() {
       window.turnstile.execute(widgetId)
     })
   }
-
-  useEffect(() => {
-    return () => {
-      if (copyTimeoutRef.current) {
-        window.clearTimeout(copyTimeoutRef.current)
-      }
-    }
-  }, [])
 
   async function submitRecommend(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -300,18 +290,10 @@ function App() {
     setAdvancedOpen(false)
     setError('')
     setResponse(null)
-    setCopiedBeatmapId(null)
   }
 
   async function copyBeatmapId(beatmapId: number) {
     await copyText(String(beatmapId))
-    setCopiedBeatmapId(beatmapId)
-    if (copyTimeoutRef.current) {
-      window.clearTimeout(copyTimeoutRef.current)
-    }
-    copyTimeoutRef.current = window.setTimeout(() => {
-      setCopiedBeatmapId(null)
-    }, 1400)
   }
 
   const submitDisabled = isLoading
@@ -424,7 +406,6 @@ function App() {
                 <BeatmapRow
                   key={beatmap.beatmap_id}
                   beatmap={beatmap}
-                  copied={copiedBeatmapId === beatmap.beatmap_id}
                   onCopy={copyBeatmapId}
                 />
               ))}
@@ -541,11 +522,10 @@ function BeatmapSummary({ beatmap, count, label }: BeatmapSummaryProps) {
 
 type BeatmapRowProps = {
   beatmap: BeatmapMetadata
-  copied: boolean
   onCopy: (beatmapId: number) => Promise<void>
 }
 
-function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
+function BeatmapRow({ beatmap, onCopy }: BeatmapRowProps) {
   return (
     <article className="beatmap-row">
       <a className="cover-link" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
@@ -565,7 +545,6 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
             <a className="map-title" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
               {displayArtist(beatmap)} - {displayTitle(beatmap)}
             </a>
-            {copied ? <span className="copied-pill">Copied ID</span> : null}
           </div>
           <div className="version-line">
             <span>{beatmap.version ?? 'Unknown difficulty'}</span>
@@ -596,10 +575,9 @@ function BeatmapRow({ beatmap, copied, onCopy }: BeatmapRowProps) {
               </button>
               <button
                 type="button"
-                className={copied ? 'copied-action' : ''}
                 onClick={() => onCopy(beatmap.beatmap_id)}
-                aria-label={copied ? 'Copied beatmap ID' : 'Copy beatmap ID'}
-                title={copied ? 'Copied' : 'Copy ID'}
+                aria-label="Copy beatmap ID"
+                title="Copy ID"
               >
                 <CopyIcon />
               </button>

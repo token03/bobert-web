@@ -509,17 +509,6 @@ button:disabled {
   white-space: nowrap;
 }
 
-.copied-pill {
-  flex: 0 0 auto;
-  border: 1px solid var(--accent-muted);
-  border-radius: 999px;
-  background: rgba(255, 102, 170, 0.13);
-  color: var(--accent-light);
-  font-size: 11px;
-  font-weight: 850;
-  padding: 3px 8px;
-}
-
 .version-line {
   display: flex;
   align-items: center;
@@ -692,11 +681,6 @@ button:disabled {
   width: 15px;
   height: 15px;
   fill: currentColor;
-}
-
-.row-actions .copied-action {
-  border-color: var(--accent-muted);
-  color: var(--accent-light);
 }
 
 .row-actions button:hover,
