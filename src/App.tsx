@@ -214,7 +214,7 @@ function App() {
       max_accuracy: numericOrNull(maxOd),
       min_drain: numericOrNull(minHp),
       max_drain: numericOrNull(maxHp),
-      status: numericOrNull(status),
+      status: status || null,
       exclude_same_set: excludeSameSet,
     }
     const minBpmValue = numericOrNull(minBpm)
