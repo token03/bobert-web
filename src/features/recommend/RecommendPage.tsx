@@ -83,7 +83,7 @@ export function RecommendPage() {
             )}
           </>
         ) : error ? null : (
-          <p className="empty-results">Please provide a beatmap for suggestions</p>
+          <p className="empty-results">Please provide a beatmap id or link</p>
         )}
       </section>
 
