@@ -29,6 +29,9 @@
 }
 
 .app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   width: 100%;
   padding: 0 var(--space-page) calc(var(--space-4xl) * 2);
 }
@@ -443,11 +446,26 @@ button:disabled {
 }
 
 .results-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--panel);
   padding: var(--space-2xl);
   box-shadow: var(--shadow);
+}
+
+.empty-results {
+  display: grid;
+  flex: 1 1 auto;
+  min-height: 100%;
+  margin: 0;
+  place-items: center;
+  color: var(--muted);
+  font-size: clamp(18px, 2vw, 26px);
+  font-weight: 800;
+  text-align: center;
 }
 
 .error-text {

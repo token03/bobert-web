@@ -68,17 +68,23 @@ export function RecommendPage() {
         {response ? (
           <>
             <SourceBeatmapCard beatmap={response.query.metadata} count={response.count} label="Source map" />
-            <ResultsList
-              beatmaps={response.results}
-              onCopy={copyBeatmapId}
-              onSearch={searchBeatmap}
-              isLoading={isLoading}
-              onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
-              activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
-              isPreviewPlaying={audio.isPlaying}
-            />
+            {response.results.length > 0 ? (
+              <ResultsList
+                beatmaps={response.results}
+                onCopy={copyBeatmapId}
+                onSearch={searchBeatmap}
+                isLoading={isLoading}
+                onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
+                activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
+                isPreviewPlaying={audio.isPlaying}
+              />
+            ) : (
+              <p className="empty-results">No beatmaps found</p>
+            )}
           </>
-        ) : null}
+        ) : error ? null : (
+          <p className="empty-results">Please provide a beatmap for suggestions</p>
+        )}
       </section>
 
       {audio.activeBeatmap ? (
