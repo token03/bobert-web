@@ -43,7 +43,7 @@
 }
 
 .primary-controls {
-  grid-template-columns: minmax(260px, 1fr) repeat(3, 72px) 72px 72px auto;
+  grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(118px, 0.8fr)) minmax(118px, 0.7fr) 72px auto;
   align-items: end;
 }
 
@@ -818,7 +818,7 @@ button:disabled {
 
 @media (max-width: 1180px) {
   .primary-controls {
-    grid-template-columns: minmax(220px, 1fr) repeat(3, 72px) 72px 72px auto;
+    grid-template-columns: repeat(4, minmax(130px, 1fr));
   }
 
   .advanced-filters {
