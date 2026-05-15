@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, Loader, RotateCcw, Search } from 'lucide-react'
+import { ChevronDown, ChevronUp, Loader, RotateCcw, Search, XCircle } from 'lucide-react'
 import { useState } from 'react'
 import type { RefObject } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
@@ -18,8 +18,11 @@ type RecommendFormProps = {
 export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef, onSubmit }: RecommendFormProps) {
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const values = form.watch()
-  const error = form.formState.errors.beatmapInput?.message ?? form.formState.errors.topK?.message
+  const beatmapError = form.formState.errors.beatmapInput?.message
+  const rowsError = form.formState.errors.topK?.message
   const submitDisabled = isLoading || form.formState.isSubmitting
+  const beatmapInput = form.register('beatmapInput')
+  const topKInput = form.register('topK')
 
   function resetForm() {
     form.reset(defaultFilters)
@@ -28,16 +31,25 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
 
   return (
     <>
-      {error ? <p className="error-text">{error}</p> : null}
       <form className="control-panel" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="primary-controls">
           <label className="field beatmap-field">
             <span>Beatmap</span>
-            <input
-              required
-              {...form.register('beatmapInput')}
-              placeholder="1872396 or https://osu.ppy.sh/beatmaps/1872396"
-            />
+            <span className="input-with-status">
+              <input
+                required
+                aria-invalid={beatmapError ? 'true' : 'false'}
+                aria-describedby={beatmapError ? 'beatmap-error' : undefined}
+                className={beatmapError ? 'has-field-error' : undefined}
+                {...beatmapInput}
+                onChange={(event) => {
+                  form.clearErrors('beatmapInput')
+                  beatmapInput.onChange(event)
+                }}
+                placeholder="1872396 or https://osu.ppy.sh/beatmaps/1872396"
+              />
+              {beatmapError ? <FieldErrorIcon id="beatmap-error" label="Invalid beatmap ID" /> : null}
+            </span>
           </label>
 
           <RangeFields label="Star" min={values.minSr} max={values.maxSr} setMin={(value) => form.setValue('minSr', value)} setMax={(value) => form.setValue('maxSr', value)} />
@@ -60,7 +72,23 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
 
           <label className="field small-field">
             <span>Rows</span>
-            <input required inputMode="numeric" pattern="[0-9]*" type="text" {...form.register('topK')} />
+            <span className="input-with-status">
+              <input
+                required
+                inputMode="numeric"
+                pattern="[0-9]*"
+                type="text"
+                aria-invalid={rowsError ? 'true' : 'false'}
+                aria-describedby={rowsError ? 'rows-error' : undefined}
+                className={rowsError ? 'has-field-error' : undefined}
+                {...topKInput}
+                onChange={(event) => {
+                  form.clearErrors('topK')
+                  topKInput.onChange(event)
+                }}
+              />
+              {rowsError ? <FieldErrorIcon id="rows-error" label="Invalid row count" /> : null}
+            </span>
           </label>
 
           <div className="form-actions">
@@ -101,5 +129,16 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
         {turnstileEnabled ? <div className="turnstile-hidden" ref={turnstileRef} /> : null}
       </form>
     </>
+  )
+}
+
+function FieldErrorIcon({ id, label }: { id: string; label: string }) {
+  return (
+    <span className="field-error-icon" tabIndex={0} aria-label={label}>
+      <XCircle />
+      <span id={id} className="field-tooltip" role="tooltip">
+        {label}
+      </span>
+    </span>
   )
 }
