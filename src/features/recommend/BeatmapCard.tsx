@@ -8,12 +8,13 @@ type BeatmapCardProps = {
   beatmap: BeatmapMetadata
   onCopy: (beatmapId: number) => Promise<void>
   onSearch: (beatmapId: number) => Promise<void>
+  isLoading: boolean
   onPlayPreview: (beatmap: BeatmapMetadata) => Promise<void>
   activePreviewSetId: number | null
   isPreviewPlaying: boolean
 }
 
-export function BeatmapCard({ beatmap, onCopy, onSearch, onPlayPreview, activePreviewSetId, isPreviewPlaying }: BeatmapCardProps) {
+export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPreview, activePreviewSetId, isPreviewPlaying }: BeatmapCardProps) {
   const hasPreview = beatmap.beatmapset_id !== null
   const isActivePreview = hasPreview && activePreviewSetId === beatmap.beatmapset_id
   const isCoverActive = isActivePreview && isPreviewPlaying
@@ -74,7 +75,7 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, onPlayPreview, activePr
               <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
             </div>
             <div className="row-actions">
-              <button type="button" onClick={() => onSearch(beatmap.beatmap_id)} aria-label="Search from this beatmap" title="Search">
+              <button type="button" disabled={isLoading} onClick={() => onSearch(beatmap.beatmap_id)} aria-label="Search from this beatmap" title="Search">
                 <Search />
               </button>
               <button type="button" onClick={() => onCopy(beatmap.beatmap_id)} aria-label="Copy beatmap ID" title="Copy ID">

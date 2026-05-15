@@ -15,14 +15,16 @@ import { useRecommendForm } from './useRecommendForm'
 export function RecommendPage() {
   const [error, setError] = useState('')
   const [response, setResponse] = useState<RecommendResponse | null>(null)
+  const [isRunning, setIsRunning] = useState(false)
   const turnstile = useTurnstile()
   const recommend = useRecommend()
   const form = useRecommendForm()
   const audio = useAudioPreview({ onError: setError })
+  const isLoading = isRunning || recommend.isPending
 
   async function runRecommend(values: RecommendFormValues) {
+    setIsRunning(true)
     setError('')
-    setResponse(null)
 
     const request = buildRecommendRequest(values)
 
@@ -33,6 +35,7 @@ export function RecommendPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed')
     } finally {
+      setIsRunning(false)
       turnstile.reset()
     }
   }
@@ -53,7 +56,7 @@ export function RecommendPage() {
 
       <RecommendForm
         form={form}
-        isLoading={recommend.isPending}
+        isLoading={isLoading}
         turnstileEnabled={turnstile.enabled}
         turnstileRef={turnstile.containerRef}
         onSubmit={runRecommend}
@@ -69,6 +72,7 @@ export function RecommendPage() {
               beatmaps={response.results}
               onCopy={copyBeatmapId}
               onSearch={searchBeatmap}
+              isLoading={isLoading}
               onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
               activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
               isPreviewPlaying={audio.isPlaying}
