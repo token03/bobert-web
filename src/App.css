@@ -823,7 +823,6 @@ button:disabled {
   justify-content: start;
   gap: var(--space-sm);
   min-width: 0;
-  font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono, Menlo, monospace;
   text-align: left;
 }
 
