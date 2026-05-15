@@ -81,6 +81,8 @@ const defaultFilters = {
 
 function App() {
   const turnstileRef = useRef<HTMLDivElement>(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const hideAudioTimerRef = useRef<number | null>(null)
   const widgetIdRef = useRef<string | null>(null)
   const pendingTurnstileResolveRef = useRef<((token: string) => void) | null>(null)
   const pendingTurnstileRejectRef = useRef<((error: Error) => void) | null>(null)
@@ -109,6 +111,43 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [response, setResponse] = useState<RecommendResponse | null>(null)
+  const [activeAudioBeatmap, setActiveAudioBeatmap] = useState<BeatmapMetadata | null>(null)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const [audioCurrentTime, setAudioCurrentTime] = useState(0)
+  const [audioDuration, setAudioDuration] = useState(0)
+  const [audioVolume, setAudioVolume] = useState(0.8)
+  const [audioMuted, setAudioMuted] = useState(false)
+  const [audioVisible, setAudioVisible] = useState(false)
+
+  useEffect(() => {
+    return () => {
+      if (hideAudioTimerRef.current !== null) {
+        window.clearTimeout(hideAudioTimerRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (hideAudioTimerRef.current !== null) {
+      window.clearTimeout(hideAudioTimerRef.current)
+      hideAudioTimerRef.current = null
+    }
+
+    if (!activeAudioBeatmap) {
+      setAudioVisible(false)
+      return
+    }
+
+    if (isAudioPlaying) {
+      setAudioVisible(true)
+      return
+    }
+
+    hideAudioTimerRef.current = window.setTimeout(() => {
+      setAudioVisible(false)
+      hideAudioTimerRef.current = null
+    }, 3000)
+  }, [activeAudioBeatmap, isAudioPlaying])
 
   useEffect(() => {
     if (!turnstileSiteKey || !turnstileRef.current || widgetIdRef.current) {
@@ -296,10 +335,173 @@ function App() {
     await copyText(String(beatmapId))
   }
 
+  function showAudioBarTemporarily() {
+    setAudioVisible(true)
+
+    if (isAudioPlaying) {
+      return
+    }
+
+    if (hideAudioTimerRef.current !== null) {
+      window.clearTimeout(hideAudioTimerRef.current)
+    }
+
+    hideAudioTimerRef.current = window.setTimeout(() => {
+      setAudioVisible(false)
+      hideAudioTimerRef.current = null
+    }, 3000)
+  }
+
+  async function playPreview(beatmap: BeatmapMetadata) {
+    const beatmapsetId = beatmap.beatmapset_id
+    const audio = audioRef.current
+
+    if (!beatmapsetId || !audio) {
+      return
+    }
+
+    showAudioBarTemporarily()
+
+    try {
+      if (activeAudioBeatmap?.beatmapset_id === beatmapsetId) {
+        if (audio.paused) {
+          if (audio.duration && audio.currentTime >= audio.duration) {
+            audio.currentTime = 0
+          }
+          await audio.play()
+        } else {
+          audio.pause()
+        }
+        return
+      }
+
+      setActiveAudioBeatmap(beatmap)
+      setAudioCurrentTime(0)
+      setAudioDuration(0)
+      audio.src = previewUrl(beatmapsetId)
+      audio.currentTime = 0
+      audio.volume = audioVolume
+      audio.muted = audioMuted
+      await audio.play()
+    } catch (err) {
+      setIsAudioPlaying(false)
+      setError(err instanceof Error ? err.message : 'Preview playback failed')
+    }
+  }
+
+  async function toggleActiveAudio() {
+    const audio = audioRef.current
+
+    if (!audio || !activeAudioBeatmap) {
+      return
+    }
+
+    showAudioBarTemporarily()
+
+    try {
+      if (audio.paused) {
+        if (audio.duration && audio.currentTime >= audio.duration) {
+          audio.currentTime = 0
+        }
+        await audio.play()
+      } else {
+        audio.pause()
+      }
+    } catch (err) {
+      setIsAudioPlaying(false)
+      setError(err instanceof Error ? err.message : 'Preview playback failed')
+    }
+  }
+
+  function seekAudio(value: string) {
+    const audio = audioRef.current
+    const nextTime = Number(value)
+
+    if (!audio || !Number.isFinite(nextTime)) {
+      return
+    }
+
+    showAudioBarTemporarily()
+    audio.currentTime = nextTime
+    setAudioCurrentTime(nextTime)
+  }
+
+  function changeAudioVolume(value: string) {
+    const audio = audioRef.current
+    const nextVolume = Number(value)
+
+    if (!Number.isFinite(nextVolume)) {
+      return
+    }
+
+    const clampedVolume = Math.min(1, Math.max(0, nextVolume))
+    setAudioVolume(clampedVolume)
+    setAudioMuted(false)
+
+    if (audio) {
+      audio.volume = clampedVolume
+      audio.muted = false
+    }
+
+    showAudioBarTemporarily()
+  }
+
+  function toggleAudioMuted() {
+    const audio = audioRef.current
+    const nextMuted = !audioMuted
+
+    setAudioMuted(nextMuted)
+    if (audio) {
+      audio.muted = nextMuted
+    }
+
+    showAudioBarTemporarily()
+  }
+
+  function handleAudioLoadedMetadata() {
+    const audio = audioRef.current
+
+    if (!audio) {
+      return
+    }
+
+    setAudioDuration(Number.isFinite(audio.duration) ? audio.duration : 0)
+  }
+
+  function handleAudioTimeUpdate() {
+    const audio = audioRef.current
+
+    if (!audio) {
+      return
+    }
+
+    setAudioCurrentTime(audio.currentTime)
+  }
+
+  function handleAudioEnded() {
+    const audio = audioRef.current
+
+    setIsAudioPlaying(false)
+    setAudioCurrentTime(audio?.duration && Number.isFinite(audio.duration) ? audio.duration : 0)
+  }
+
   const submitDisabled = isLoading
 
   return (
     <main className="app-shell">
+      <audio
+        ref={audioRef}
+        preload="none"
+        onPlay={() => {
+          setIsAudioPlaying(true)
+          setAudioVisible(true)
+        }}
+        onPause={() => setIsAudioPlaying(false)}
+        onLoadedMetadata={handleAudioLoadedMetadata}
+        onTimeUpdate={handleAudioTimeUpdate}
+        onEnded={handleAudioEnded}
+      />
+
       <form className="control-panel" onSubmit={submitRecommend}>
         <div className="primary-controls">
           <label className="field beatmap-field">
@@ -407,12 +609,31 @@ function App() {
                   key={beatmap.beatmap_id}
                   beatmap={beatmap}
                   onCopy={copyBeatmapId}
+                  onPlayPreview={playPreview}
+                  activePreviewSetId={activeAudioBeatmap?.beatmapset_id ?? null}
+                  isPreviewPlaying={isAudioPlaying}
                 />
               ))}
             </div>
           </>
         ) : null}
       </section>
+
+      {activeAudioBeatmap && audioVisible ? (
+        <AudioPlayerBar
+          beatmap={activeAudioBeatmap}
+          isPlaying={isAudioPlaying}
+          currentTime={audioCurrentTime}
+          duration={audioDuration}
+          volume={audioVolume}
+          muted={audioMuted}
+          onTogglePlay={toggleActiveAudio}
+          onSeek={seekAudio}
+          onToggleMuted={toggleAudioMuted}
+          onVolumeChange={changeAudioVolume}
+          onPointerDown={showAudioBarTemporarily}
+        />
+      ) : null}
     </main>
   )
 }
@@ -513,9 +734,15 @@ function BeatmapSummary({ beatmap, count, label }: BeatmapSummaryProps) {
 type BeatmapRowProps = {
   beatmap: BeatmapMetadata
   onCopy: (beatmapId: number) => Promise<void>
+  onPlayPreview: (beatmap: BeatmapMetadata) => Promise<void>
+  activePreviewSetId: number | null
+  isPreviewPlaying: boolean
 }
 
-function BeatmapRow({ beatmap, onCopy }: BeatmapRowProps) {
+function BeatmapRow({ beatmap, onCopy, onPlayPreview, activePreviewSetId, isPreviewPlaying }: BeatmapRowProps) {
+  const hasPreview = beatmap.beatmapset_id !== null
+  const isActivePreview = hasPreview && activePreviewSetId === beatmap.beatmapset_id
+
   return (
     <article className="beatmap-row">
       <a className="cover-link" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
@@ -561,8 +788,14 @@ function BeatmapRow({ beatmap, onCopy }: BeatmapRowProps) {
               <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
             </div>
             <div className="row-actions">
-              <button type="button" aria-label="Play preview" title="Play preview">
-                <PlayIcon />
+              <button
+                type="button"
+                disabled={!hasPreview}
+                onClick={() => onPlayPreview(beatmap)}
+                aria-label={hasPreview ? 'Play preview' : 'No preview available'}
+                title={hasPreview ? 'Play preview' : 'No preview available'}
+              >
+                {isActivePreview && isPreviewPlaying ? <PauseIcon /> : <PlayIcon />}
               </button>
               <button
                 type="button"
@@ -583,6 +816,79 @@ function BeatmapRow({ beatmap, onCopy }: BeatmapRowProps) {
   )
 }
 
+type AudioPlayerBarProps = {
+  beatmap: BeatmapMetadata
+  isPlaying: boolean
+  currentTime: number
+  duration: number
+  volume: number
+  muted: boolean
+  onTogglePlay: () => Promise<void>
+  onSeek: (value: string) => void
+  onToggleMuted: () => void
+  onVolumeChange: (value: string) => void
+  onPointerDown: () => void
+}
+
+function AudioPlayerBar({
+  beatmap,
+  isPlaying,
+  currentTime,
+  duration,
+  volume,
+  muted,
+  onTogglePlay,
+  onSeek,
+  onToggleMuted,
+  onVolumeChange,
+  onPointerDown,
+}: AudioPlayerBarProps) {
+  const safeDuration = Number.isFinite(duration) ? Math.max(0, duration) : 0
+  const safeCurrentTime = Math.min(safeDuration || currentTime, Math.max(0, currentTime))
+  const volumeValue = muted ? 0 : volume
+
+  return (
+    <aside className="audio-pill" aria-label="Audio preview player" onPointerDown={onPointerDown} onFocus={onPointerDown}>
+      <button type="button" className="audio-control-button" onClick={onTogglePlay} aria-label={isPlaying ? 'Pause preview' : 'Play preview'}>
+        {isPlaying ? <PauseIcon /> : <PlayIcon />}
+      </button>
+
+      <div className="audio-pill-main">
+        <div className="audio-pill-heading">
+          <span>{displayArtist(beatmap)} - {displayTitle(beatmap)}</span>
+          <small>{formatLength(safeCurrentTime)} / {formatLength(safeDuration)}</small>
+        </div>
+        <input
+          className="audio-progress"
+          type="range"
+          min="0"
+          max={safeDuration || 0}
+          step="0.1"
+          value={safeCurrentTime}
+          disabled={!safeDuration}
+          onChange={(event) => onSeek(event.target.value)}
+          aria-label="Preview progress"
+        />
+      </div>
+
+      <div className="audio-volume">
+        <button type="button" className="audio-control-button" onClick={onToggleMuted} aria-label={muted ? 'Unmute preview' : 'Mute preview'}>
+          {muted || volume === 0 ? <MutedIcon /> : <VolumeIcon />}
+        </button>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volumeValue}
+          onChange={(event) => onVolumeChange(event.target.value)}
+          aria-label="Preview volume"
+        />
+      </div>
+    </aside>
+  )
+}
+
 function ChevronIcon({ open }: { open: boolean }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -595,6 +901,30 @@ function PlayIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M8 5v14l11-7L8 5Z" />
+    </svg>
+  )
+}
+
+function PauseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 5h4v14H7V5Zm6 0h4v14h-4V5Z" />
+    </svg>
+  )
+}
+
+function VolumeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 9v6h4l5 4V5L8 9H4Zm12.5-1.5-1.4 1.4a4.4 4.4 0 0 1 0 6.2l1.4 1.4a6.4 6.4 0 0 0 0-9Zm2.8-2.8-1.4 1.4a8.3 8.3 0 0 1 0 11.8l1.4 1.4a10.3 10.3 0 0 0 0-14.6Z" />
+    </svg>
+  )
+}
+
+function MutedIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 9v6h4l5 4V5L8 9H4Zm11.7.3 2.3 2.3 2.3-2.3 1.4 1.4-2.3 2.3 2.3 2.3-1.4 1.4-2.3-2.3-2.3 2.3-1.4-1.4 2.3-2.3-2.3-2.3 1.4-1.4Z" />
     </svg>
   )
 }
@@ -725,6 +1055,10 @@ async function copyText(value: string) {
 
 function beatmapUrl(beatmap: BeatmapMetadata): string {
   return beatmap.url ?? `https://osu.ppy.sh/beatmaps/${beatmap.beatmap_id}`
+}
+
+function previewUrl(beatmapsetId: number): string {
+  return `https://b.ppy.sh/preview/${beatmapsetId}.mp3`
 }
 
 function coverUrl(beatmapsetId: number, twoX = false): string {
