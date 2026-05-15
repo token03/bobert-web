@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronUp, LoaderCircle, RotateCcw, Search } from 'lucide-react'
+import { ChevronDown, ChevronUp, Loader, RotateCcw, Search } from 'lucide-react'
 import { useState } from 'react'
 import type { RefObject } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
@@ -19,6 +19,7 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const values = form.watch()
   const error = form.formState.errors.beatmapInput?.message ?? form.formState.errors.topK?.message
+  const submitDisabled = isLoading || form.formState.isSubmitting
 
   function resetForm() {
     form.reset(defaultFilters)
@@ -67,8 +68,8 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
               <RotateCcw />
               <span className="sr-only">Reset</span>
             </button>
-            <button className="primary-button" type="submit" disabled={isLoading} aria-label="Recommend">
-              {isLoading ? <LoaderCircle className="spinner-icon" /> : <Search />}
+            <button className="primary-button" type="submit" disabled={submitDisabled} aria-label="Recommend">
+              {submitDisabled ? <Loader className="spinner-icon" /> : <Search />}
               <span className="sr-only">Recommend</span>
             </button>
           </div>

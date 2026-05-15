@@ -176,7 +176,8 @@ button:disabled {
 .ghost-button svg {
   width: 18px;
   height: 18px;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
 }
 
 .primary-button {
@@ -231,7 +232,8 @@ button:disabled {
 .advanced-toggle svg {
   width: 16px;
   height: 16px;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
 }
 
 .slider-field {
@@ -517,7 +519,8 @@ button:disabled {
 .cover-play-button svg {
   width: 32px;
   height: 32px;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
 }
 
 .cover-placeholder {
@@ -763,7 +766,8 @@ button:disabled {
 .row-actions svg {
   width: 15px;
   height: 15px;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
 }
 
 .row-actions button:hover,
@@ -840,7 +844,8 @@ button:disabled {
 .audio-control-button svg {
   width: 17px;
   height: 17px;
-  fill: currentColor;
+  fill: none;
+  stroke: currentColor;
 }
 
 .audio-pill-main {
