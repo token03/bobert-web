@@ -93,6 +93,12 @@ export function RecommendPage() {
           onPointerDown={audio.showTemporarily}
         />
       ) : null}
+
+      <footer className="site-footer">
+        <span>
+          made by <a href="https://osu.ppy.sh/users/4881051" target="_blank" rel="noreferrer">tkn</a>
+        </span>
+      </footer>
     </main>
   )
 }

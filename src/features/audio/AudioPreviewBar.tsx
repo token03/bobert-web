@@ -1,5 +1,4 @@
 import { Pause, Play, Volume2, VolumeX } from 'lucide-react'
-import { displayArtist, displayTitle, formatLength } from '../../shared/format'
 import type { BeatmapMetadata } from '../../shared/types'
 
 type AudioPreviewBarProps = {
@@ -38,7 +37,7 @@ export function AudioPreviewBar({
   return (
     <aside
       className={visible ? 'audio-pill is-visible' : 'audio-pill is-hidden'}
-      aria-label="Audio preview player"
+      aria-label={`Audio preview player for ${beatmap.title}`}
       onPointerDown={onPointerDown}
       onFocus={onPointerDown}
     >
@@ -47,10 +46,6 @@ export function AudioPreviewBar({
       </button>
 
       <div className="audio-pill-main">
-        <div className="audio-pill-heading">
-          <span>{displayArtist(beatmap)} - {displayTitle(beatmap)}</span>
-          <small>{formatLength(safeCurrentTime)} / {formatLength(safeDuration)}</small>
-        </div>
         <input
           className="audio-progress"
           type="range"

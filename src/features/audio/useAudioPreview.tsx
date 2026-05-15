@@ -25,16 +25,22 @@ export function useAudioPreview({ onError }: UseAudioPreviewOptions) {
     }
   }, [])
 
+  function clearHideTimer() {
+    if (hideTimerRef.current !== null) {
+      window.clearTimeout(hideTimerRef.current)
+      hideTimerRef.current = null
+    }
+  }
+
   function showTemporarily(forceHideTimer = false) {
     setVisible(true)
 
     if (isPlaying && !forceHideTimer) {
+      clearHideTimer()
       return
     }
 
-    if (hideTimerRef.current !== null) {
-      window.clearTimeout(hideTimerRef.current)
-    }
+    clearHideTimer()
 
     hideTimerRef.current = window.setTimeout(() => {
       setVisible(false)
@@ -50,7 +56,8 @@ export function useAudioPreview({ onError }: UseAudioPreviewOptions) {
       return
     }
 
-    showTemporarily(true)
+    setVisible(true)
+    clearHideTimer()
 
     try {
       if (activeBeatmap?.beatmapset_id === beatmapsetId) {
@@ -184,6 +191,7 @@ export function useAudioPreview({ onError }: UseAudioPreviewOptions) {
         onPlay={() => {
           setIsPlaying(true)
           setVisible(true)
+          clearHideTimer()
         }}
         onPause={() => {
           setIsPlaying(false)
