@@ -115,7 +115,7 @@ function App() {
   const [isAudioPlaying, setIsAudioPlaying] = useState(false)
   const [audioCurrentTime, setAudioCurrentTime] = useState(0)
   const [audioDuration, setAudioDuration] = useState(0)
-  const [audioVolume, setAudioVolume] = useState(0.8)
+  const [audioVolume, setAudioVolume] = useState(0.25)
   const [audioMuted, setAudioMuted] = useState(false)
   const [audioVisible, setAudioVisible] = useState(false)
 
@@ -752,8 +752,8 @@ function BeatmapRow({ beatmap, onCopy, onPlayPreview, activePreviewSetId, isPrev
         type="button"
         disabled={!hasPreview}
         onClick={() => onPlayPreview(beatmap)}
-        aria-label={hasPreview ? 'Play preview' : 'No preview available'}
-        title={hasPreview ? 'Play preview' : 'No preview available'}
+        aria-label={hasPreview ? (isCoverActive ? 'Pause preview' : 'Play preview') : 'No preview available'}
+        title={hasPreview ? (isCoverActive ? 'Pause preview' : 'Play preview') : 'No preview available'}
       >
         {beatmap.beatmapset_id ? (
           <img
