@@ -43,7 +43,7 @@ export function AudioPreviewBar({
       onFocus={onPointerDown}
     >
       <button type="button" className="audio-control-button" onClick={onTogglePlay} aria-label={isPlaying ? 'Pause preview' : 'Play preview'}>
-        {isPlaying ? <Pause /> : <Play />}
+        {isPlaying ? <Pause className="filled-icon" /> : <Play className="filled-icon" />}
       </button>
 
       <div className="audio-pill-main">

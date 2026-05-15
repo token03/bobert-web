@@ -36,7 +36,7 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, onPlayPreview, activePr
         {hasPreview ? (
           <span className="cover-play-overlay" aria-hidden="true">
             <span className="cover-play-button">
-              {isCoverActive ? <Pause /> : <Play />}
+              {isCoverActive ? <Pause className="filled-icon" /> : <Play className="filled-icon" />}
             </span>
           </span>
         ) : null}
