@@ -228,6 +228,10 @@ function App() {
       return
     }
 
+    await runRecommend(beatmapId)
+  }
+
+  async function runRecommend(beatmapId: number) {
     setIsLoading(true)
     setError('')
     setResponse(null)
@@ -305,6 +309,11 @@ function App() {
         setTurnstileStatus('waiting')
       }
     }
+  }
+
+  async function searchBeatmap(beatmapId: number) {
+    setBeatmapInput(String(beatmapId))
+    await runRecommend(beatmapId)
   }
 
   function resetForm() {
@@ -609,6 +618,7 @@ function App() {
                   key={beatmap.beatmap_id}
                   beatmap={beatmap}
                   onCopy={copyBeatmapId}
+                  onSearch={searchBeatmap}
                   onPlayPreview={playPreview}
                   activePreviewSetId={activeAudioBeatmap?.beatmapset_id ?? null}
                   isPreviewPlaying={isAudioPlaying}
@@ -735,12 +745,13 @@ function BeatmapSummary({ beatmap, count, label }: BeatmapSummaryProps) {
 type BeatmapRowProps = {
   beatmap: BeatmapMetadata
   onCopy: (beatmapId: number) => Promise<void>
+  onSearch: (beatmapId: number) => Promise<void>
   onPlayPreview: (beatmap: BeatmapMetadata) => Promise<void>
   activePreviewSetId: number | null
   isPreviewPlaying: boolean
 }
 
-function BeatmapRow({ beatmap, onCopy, onPlayPreview, activePreviewSetId, isPreviewPlaying }: BeatmapRowProps) {
+function BeatmapRow({ beatmap, onCopy, onSearch, onPlayPreview, activePreviewSetId, isPreviewPlaying }: BeatmapRowProps) {
   const hasPreview = beatmap.beatmapset_id !== null
   const isActivePreview = hasPreview && activePreviewSetId === beatmap.beatmapset_id
   const isCoverActive = isActivePreview && isPreviewPlaying
@@ -804,6 +815,14 @@ function BeatmapRow({ beatmap, onCopy, onPlayPreview, activePreviewSetId, isPrev
               <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
             </div>
             <div className="row-actions">
+              <button
+                type="button"
+                onClick={() => onSearch(beatmap.beatmap_id)}
+                aria-label="Search from this beatmap"
+                title="Search"
+              >
+                <SearchIcon />
+              </button>
               <button
                 type="button"
                 onClick={() => onCopy(beatmap.beatmap_id)}
