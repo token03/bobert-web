@@ -115,7 +115,7 @@
   gap: calc(var(--space-md) + var(--space-2xs));
 }
 
-.field span,
+.field > span:not(.input-with-status),
 .range-field > span,
 .slider-label {
   color: var(--muted);

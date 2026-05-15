@@ -19,7 +19,6 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const values = form.watch()
   const beatmapError = form.formState.errors.beatmapInput?.message
-  const rowsError = form.formState.errors.topK?.message
   const submitDisabled = isLoading || form.formState.isSubmitting
   const beatmapInput = form.register('beatmapInput')
   const topKInput = form.register('topK')
@@ -72,23 +71,18 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
 
           <label className="field small-field">
             <span>Rows</span>
-            <span className="input-with-status">
-              <input
-                required
-                inputMode="numeric"
-                pattern="[0-9]*"
-                type="text"
-                aria-invalid={rowsError ? 'true' : 'false'}
-                aria-describedby={rowsError ? 'rows-error' : undefined}
-                className={rowsError ? 'has-field-error' : undefined}
-                {...topKInput}
-                onChange={(event) => {
-                  form.clearErrors('topK')
+            <input
+              required
+              inputMode="numeric"
+              pattern="[0-9]*"
+              type="text"
+              {...topKInput}
+              onChange={(event) => {
+                if (/^\d*$/.test(event.target.value)) {
                   topKInput.onChange(event)
-                }}
-              />
-              {rowsError ? <FieldErrorIcon id="rows-error" label="Invalid row count" /> : null}
-            </span>
+                }
+              }}
+            />
           </label>
 
           <div className="form-actions">

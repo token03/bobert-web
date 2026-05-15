@@ -7,6 +7,12 @@ type RangeFieldsProps = {
 }
 
 export function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps) {
+  function updateNumber(value: string, update: (value: string) => void) {
+    if (/^\d*\.?\d*$/.test(value)) {
+      update(value)
+    }
+  }
+
   return (
     <div className="range-field">
       <span>{label}</span>
@@ -14,7 +20,7 @@ export function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProp
         inputMode="decimal"
         type="text"
         value={min}
-        onChange={(event) => setMin(event.target.value)}
+        onChange={(event) => updateNumber(event.target.value, setMin)}
         placeholder="min"
         aria-label={`${label} minimum`}
       />
@@ -22,7 +28,7 @@ export function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProp
         inputMode="decimal"
         type="text"
         value={max}
-        onChange={(event) => setMax(event.target.value)}
+        onChange={(event) => updateNumber(event.target.value, setMax)}
         placeholder="max"
         aria-label={`${label} maximum`}
       />
