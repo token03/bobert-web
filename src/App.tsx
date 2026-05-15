@@ -619,9 +619,10 @@ function App() {
         ) : null}
       </section>
 
-      {activeAudioBeatmap && audioVisible ? (
+      {activeAudioBeatmap ? (
         <AudioPlayerBar
           beatmap={activeAudioBeatmap}
+          visible={audioVisible}
           isPlaying={isAudioPlaying}
           currentTime={audioCurrentTime}
           duration={audioDuration}
@@ -742,10 +743,18 @@ type BeatmapRowProps = {
 function BeatmapRow({ beatmap, onCopy, onPlayPreview, activePreviewSetId, isPreviewPlaying }: BeatmapRowProps) {
   const hasPreview = beatmap.beatmapset_id !== null
   const isActivePreview = hasPreview && activePreviewSetId === beatmap.beatmapset_id
+  const isCoverActive = isActivePreview && isPreviewPlaying
 
   return (
     <article className="beatmap-row">
-      <a className="cover-link" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
+      <button
+        className={isCoverActive ? 'cover-preview is-audio-active' : 'cover-preview'}
+        type="button"
+        disabled={!hasPreview}
+        onClick={() => onPlayPreview(beatmap)}
+        aria-label={hasPreview ? 'Play preview' : 'No preview available'}
+        title={hasPreview ? 'Play preview' : 'No preview available'}
+      >
         {beatmap.beatmapset_id ? (
           <img
             src={coverUrl(beatmap.beatmapset_id)}
@@ -754,7 +763,14 @@ function BeatmapRow({ beatmap, onCopy, onPlayPreview, activePreviewSetId, isPrev
         ) : (
           <span className="cover-placeholder">osu!</span>
         )}
-      </a>
+        {hasPreview ? (
+          <span className="cover-play-overlay" aria-hidden="true">
+            <span className="cover-play-button">
+              {isCoverActive ? <PauseIcon /> : <PlayIcon />}
+            </span>
+          </span>
+        ) : null}
+      </button>
 
       <div className="map-content">
           <div className="map-main">
@@ -790,15 +806,6 @@ function BeatmapRow({ beatmap, onCopy, onPlayPreview, activePreviewSetId, isPrev
             <div className="row-actions">
               <button
                 type="button"
-                disabled={!hasPreview}
-                onClick={() => onPlayPreview(beatmap)}
-                aria-label={hasPreview ? 'Play preview' : 'No preview available'}
-                title={hasPreview ? 'Play preview' : 'No preview available'}
-              >
-                {isActivePreview && isPreviewPlaying ? <PauseIcon /> : <PlayIcon />}
-              </button>
-              <button
-                type="button"
                 onClick={() => onCopy(beatmap.beatmap_id)}
                 aria-label="Copy beatmap ID"
                 title="Copy ID"
@@ -818,6 +825,7 @@ function BeatmapRow({ beatmap, onCopy, onPlayPreview, activePreviewSetId, isPrev
 
 type AudioPlayerBarProps = {
   beatmap: BeatmapMetadata
+  visible: boolean
   isPlaying: boolean
   currentTime: number
   duration: number
@@ -832,6 +840,7 @@ type AudioPlayerBarProps = {
 
 function AudioPlayerBar({
   beatmap,
+  visible,
   isPlaying,
   currentTime,
   duration,
@@ -848,7 +857,12 @@ function AudioPlayerBar({
   const volumeValue = muted ? 0 : volume
 
   return (
-    <aside className="audio-pill" aria-label="Audio preview player" onPointerDown={onPointerDown} onFocus={onPointerDown}>
+    <aside
+      className={visible ? 'audio-pill is-visible' : 'audio-pill is-hidden'}
+      aria-label="Audio preview player"
+      onPointerDown={onPointerDown}
+      onFocus={onPointerDown}
+    >
       <button type="button" className="audio-control-button" onClick={onTogglePlay} aria-label={isPlaying ? 'Pause preview' : 'Play preview'}>
         {isPlaying ? <PauseIcon /> : <PlayIcon />}
       </button>
