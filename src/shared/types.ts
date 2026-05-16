@@ -28,6 +28,11 @@ export type RecommendResponse = {
   results: BeatmapMetadata[]
 }
 
+export type DefaultRecommendResponse = {
+  count: number
+  results: BeatmapMetadata[]
+}
+
 export type RecommendRequest = {
   beatmapId: number
   topK: number

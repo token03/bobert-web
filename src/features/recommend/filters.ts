@@ -87,6 +87,10 @@ export function buildRecommendRequest(values: RecommendFormValues) {
   }
 }
 
+export function normalizeBeatmapInput(value: string): string {
+  return String(parseBeatmapId(value) ?? value.trim())
+}
+
 export function parseBeatmapId(value: string): number | null {
   const trimmed = value.trim()
   if (!trimmed) {

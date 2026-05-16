@@ -1,5 +1,5 @@
 import type { RecommendResponse } from '../../shared/types'
-import { defaultFilters } from './filters'
+import { defaultFilters, normalizeBeatmapInput } from './filters'
 import type { RecommendFormValues } from './filters'
 
 const cachePrefix = 'bobert:recommend:'
@@ -30,7 +30,7 @@ type CachedRecommendation = {
 
 export function recommendSearchParams(values: RecommendFormValues) {
   const params = new URLSearchParams()
-  params.set(beatmapParam, values.beatmapInput.trim())
+  params.set(beatmapParam, normalizeBeatmapInput(values.beatmapInput))
 
   for (const field of fields) {
     if (values[field] !== defaultFilters[field]) {
@@ -55,7 +55,7 @@ export function valuesFromRecommendSearch(search: string): RecommendFormValues |
 
   const values: RecommendFormValues = {
     ...defaultFilters,
-    beatmapInput,
+    beatmapInput: normalizeBeatmapInput(beatmapInput),
   }
 
   for (const field of fields) {

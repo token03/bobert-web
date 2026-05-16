@@ -2,7 +2,7 @@ import { ChevronDown, ChevronUp, Loader, RotateCcw, Search, XCircle } from 'luci
 import { useState } from 'react'
 import type { RefObject } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { defaultFilters } from './filters'
+import { defaultFilters, normalizeBeatmapInput } from './filters'
 import type { RecommendFormValues } from './filters'
 import { RangeFields } from './RangeFields'
 import { SliderRangeFields } from './SliderRangeFields'
@@ -44,6 +44,10 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
                 onChange={(event) => {
                   form.clearErrors('beatmapInput')
                   beatmapInput.onChange(event)
+                }}
+                onBlur={(event) => {
+                  beatmapInput.onBlur(event)
+                  form.setValue('beatmapInput', normalizeBeatmapInput(event.target.value), { shouldValidate: false })
                 }}
                 placeholder="1872396 or https://osu.ppy.sh/beatmaps/1872396"
               />
