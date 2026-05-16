@@ -98,7 +98,6 @@ export function RecommendPage() {
     form.setValue('beatmapInput', normalizedValues.beatmapInput, { shouldValidate: false })
     setIsRunning(true)
     setError('')
-    setDefaultResponse(null)
 
     const request = buildRecommendRequest(normalizedValues)
 
@@ -124,6 +123,7 @@ export function RecommendPage() {
 
   const resultBeatmaps = response?.results ?? defaultResponse?.results ?? []
   const showDefaultResults = !response && defaultResponse !== null
+  const fallbackBeatmaps = defaultResponse?.results ?? []
 
   function updateRecommendationUrl(values: RecommendFormValues, historyMode: HistoryMode) {
     if (historyMode === 'none') {
@@ -164,9 +164,9 @@ export function RecommendPage() {
         {response ? (
           <>
             <SourceBeatmapCard beatmap={response.query.metadata} count={response.count} label="Source map" />
-            {response.results.length > 0 ? (
+            {(response.results.length > 0 ? response.results : fallbackBeatmaps).length > 0 ? (
               <ResultsList
-                beatmaps={response.results}
+                beatmaps={response.results.length > 0 ? response.results : fallbackBeatmaps}
                 onCopy={copyBeatmapId}
                 onSearch={searchBeatmap}
                 isLoading={isLoading}
@@ -175,7 +175,7 @@ export function RecommendPage() {
                 isPreviewPlaying={audio.isPlaying}
               />
             ) : (
-              <p className="empty-results">No beatmaps found</p>
+              <p className="empty-results">No results found</p>
             )}
           </>
         ) : showDefaultResults ? (
@@ -190,12 +190,12 @@ export function RecommendPage() {
               isPreviewPlaying={audio.isPlaying}
             />
           ) : (
-            <p className="empty-results">No beatmaps found</p>
+            <p className="empty-results">No results found</p>
           )
         ) : defaultLoading ? (
           <p className="empty-results">Loading recommendations</p>
         ) : error ? null : (
-          <p className="empty-results">Please provide a beatmap id or link</p>
+          <p className="empty-results">Loading recommendations</p>
         )}
       </section>
 
