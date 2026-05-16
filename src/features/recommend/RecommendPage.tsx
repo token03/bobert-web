@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AudioPreviewBar } from '../audio/AudioPreviewBar'
 import { useAudioPreview } from '../audio/useAudioPreview'
 import { useTurnstile } from '../turnstile/useTurnstile'
@@ -7,10 +7,13 @@ import type { BeatmapMetadata, RecommendResponse } from '../../shared/types'
 import { buildRecommendRequest, defaultFilters } from './filters'
 import type { RecommendFormValues } from './filters'
 import { RecommendForm } from './RecommendForm'
+import { readCachedRecommendation, recommendSearchParams, valuesFromRecommendSearch, writeCachedRecommendation } from './recommendHistory'
 import { ResultsList } from './ResultsList'
 import { SourceBeatmapCard } from './SourceBeatmapCard'
 import { useRecommend } from './useRecommend'
 import { useRecommendForm } from './useRecommendForm'
+
+type HistoryMode = 'push' | 'replace' | 'none'
 
 export function RecommendPage() {
   const [error, setError] = useState('')
@@ -22,7 +25,39 @@ export function RecommendPage() {
   const audio = useAudioPreview({ onError: setError })
   const isLoading = isRunning || recommend.isPending
 
-  async function runRecommend(values: RecommendFormValues) {
+  useEffect(() => {
+    function restoreFromLocation() {
+      const values = valuesFromRecommendSearch(window.location.search)
+
+      if (!values) {
+        form.reset(defaultFilters)
+        setResponse(null)
+        setError('')
+        return
+      }
+
+      form.reset(values)
+
+      const cached = readCachedRecommendation(values)
+      if (cached) {
+        setResponse(cached.response)
+        setError('')
+        return
+      }
+
+      setResponse(null)
+      setError('These recommendations are not cached in this tab anymore. Run the search again to refresh them.')
+    }
+
+    restoreFromLocation()
+    window.addEventListener('popstate', restoreFromLocation)
+
+    return () => {
+      window.removeEventListener('popstate', restoreFromLocation)
+    }
+  }, [form])
+
+  async function runRecommend(values: RecommendFormValues, historyMode: HistoryMode = 'push') {
     setIsRunning(true)
     setError('')
 
@@ -32,6 +67,8 @@ export function RecommendPage() {
       const turnstileToken = turnstile.enabled ? await turnstile.getToken() : ''
       const data = await recommend.mutateAsync({ ...request, turnstileToken })
       setResponse(data)
+      writeCachedRecommendation(values, data)
+      updateRecommendationUrl(values, historyMode)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed')
     } finally {
@@ -44,6 +81,23 @@ export function RecommendPage() {
     const nextValues = { ...defaultFilters, beatmapInput: String(beatmapId) }
     form.reset(nextValues)
     await runRecommend(nextValues)
+  }
+
+  function updateRecommendationUrl(values: RecommendFormValues, historyMode: HistoryMode) {
+    if (historyMode === 'none') {
+      return
+    }
+
+    const search = recommendSearchParams(values)
+    const nextUrl = `${window.location.pathname}?${search}`
+    const currentUrl = `${window.location.pathname}${window.location.search}`
+
+    if (historyMode === 'replace' || currentUrl === nextUrl) {
+      window.history.replaceState(null, '', nextUrl)
+      return
+    }
+
+    window.history.pushState(null, '', nextUrl)
   }
 
   async function copyBeatmapId(beatmapId: number) {
