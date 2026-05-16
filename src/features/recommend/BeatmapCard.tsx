@@ -1,4 +1,4 @@
-import { Copy, Download, Pause, Play, Search } from 'lucide-react'
+import { Copy, Pause, Play, Search, Send } from 'lucide-react'
 import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatMatch, formatNumber, statusClass, statusLabel } from '../../shared/format'
 import { Stat } from '../../shared/ui/Stat'
 import type { BeatmapMetadata } from '../../shared/types'
@@ -81,9 +81,9 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPrevie
               <button type="button" onClick={() => onCopy(beatmap.beatmap_id)} aria-label="Copy beatmap ID" title="Copy ID">
                 <Copy />
               </button>
-              <a href={`osu://b/${beatmap.beatmap_id}`} aria-label="Download beatmap" title="Download">
-                <Download />
-              </a>
+              <button type="button" onClick={() => window.location.assign(`osu://b/${beatmap.beatmap_id}`)} aria-label="Open beatmap in osu!" title="Open in osu!">
+                <Send />
+              </button>
             </div>
           </div>
         </div>
