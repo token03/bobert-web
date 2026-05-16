@@ -123,7 +123,6 @@ export function RecommendPage() {
 
   const resultBeatmaps = response?.results ?? defaultResponse?.results ?? []
   const showDefaultResults = !response && defaultResponse !== null
-  const fallbackBeatmaps = defaultResponse?.results ?? []
 
   function updateRecommendationUrl(values: RecommendFormValues, historyMode: HistoryMode) {
     if (historyMode === 'none') {
@@ -164,9 +163,9 @@ export function RecommendPage() {
         {response ? (
           <>
             <SourceBeatmapCard beatmap={response.query.metadata} count={response.count} label="Source map" />
-            {(response.results.length > 0 ? response.results : fallbackBeatmaps).length > 0 ? (
+            {response.results.length > 0 ? (
               <ResultsList
-                beatmaps={response.results.length > 0 ? response.results : fallbackBeatmaps}
+                beatmaps={response.results}
                 onCopy={copyBeatmapId}
                 onSearch={searchBeatmap}
                 isLoading={isLoading}
