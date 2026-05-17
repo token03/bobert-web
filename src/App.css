@@ -866,6 +866,14 @@ button:disabled {
   text-transform: uppercase;
 }
 
+.stat-item span svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+}
+
 .stat-item strong {
   color: var(--text);
   font-size: 13px;

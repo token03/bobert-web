@@ -1,4 +1,4 @@
-import { Copy, Download, Pause, Play, Search } from 'lucide-react'
+import { Clock, Copy, Download, Metronome, Pause, Play, Search, Star } from 'lucide-react'
 import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatMatch, formatNumber, statusClass, statusLabel } from '../../shared/format'
 import { Stat } from '../../shared/ui/Stat'
 import type { BeatmapMetadata } from '../../shared/types'
@@ -63,9 +63,9 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPrevie
 
         <div className="stat-strip">
           <div className="stat-row stat-row-main">
-            <Stat label="Star" value={formatNumber(beatmap.stars, 2)} featured />
-            <Stat label="BPM" value={formatNumber(beatmap.bpm, 0)} featured />
-            <Stat label="Len" value={formatLength(beatmap.total_length)} featured />
+            <Stat label={<Star aria-label="Star" />} value={formatNumber(beatmap.stars, 2)} featured />
+            <Stat label={<Metronome aria-label="BPM" />} value={formatNumber(beatmap.bpm, 0)} featured />
+            <Stat label={<Clock aria-label="Length" />} value={formatLength(beatmap.total_length)} featured />
           </div>
           <div className="stat-side">
             <div className="stat-row stat-row-sub">
@@ -75,7 +75,7 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPrevie
               <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
             </div>
             <div className="row-actions">
-              <button type="button" disabled={isLoading} onClick={() => onSearch(beatmap.beatmap_id)} aria-label="Search from this beatmap" title="Search">
+              <button type="button" disabled={isLoading} onClick={() => onSearch(beatmap.beatmap_id)} aria-label="Search similar" title="Search similar">
                 <Search />
               </button>
               <button type="button" onClick={() => onCopy(beatmap.beatmap_id)} aria-label="Copy beatmap ID" title="Copy ID">

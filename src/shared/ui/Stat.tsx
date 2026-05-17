@@ -1,6 +1,8 @@
+import type { ReactNode } from 'react'
+
 type StatProps = {
   featured?: boolean
-  label: string
+  label: ReactNode
   value: string
 }
 
