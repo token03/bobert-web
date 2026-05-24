@@ -189,40 +189,24 @@ export function RecommendPage() {
         {error ? <p className="error-text">{error}</p> : null}
 
         <div className="recommend-layout">
+          {response ? <SourceBeatmapCard beatmap={response.query.metadata} onCopy={copyBeatmapId} /> : null}
+          {recommendForm}
           {response ? (
-            <>
-              <SourceBeatmapCard beatmap={response.query.metadata} onCopy={copyBeatmapId} />
-              {recommendForm}
-              {response.results.length > 0 ? (
-                resultsList(response.results)
-              ) : (
-                <p className="empty-results">No results found</p>
-              )}
-            </>
+            response.results.length > 0 ? (
+              resultsList(response.results)
+            ) : (
+              <p className="empty-results">No results found</p>
+            )
           ) : showDefaultResults ? (
             resultBeatmaps.length > 0 ? (
-              <>
-                {recommendForm}
-                {resultsList(resultBeatmaps)}
-              </>
+              resultsList(resultBeatmaps)
             ) : (
-              <>
-                {recommendForm}
-                <p className="empty-results">No results found</p>
-              </>
+              <p className="empty-results">No results found</p>
             )
           ) : defaultLoading ? (
-            <>
-              {recommendForm}
-              <p className="empty-results">Loading recommendations</p>
-            </>
-          ) : error ? (
-            recommendForm
-          ) : (
-            <>
-              {recommendForm}
-              <p className="empty-results">Loading recommendations</p>
-            </>
+            <p className="empty-results">Loading recommendations</p>
+          ) : error ? null : (
+            <p className="empty-results">Loading recommendations</p>
           )}
         </div>
       </section>

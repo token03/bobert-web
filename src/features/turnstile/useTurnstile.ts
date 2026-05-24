@@ -47,6 +47,7 @@ export function useTurnstile() {
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: turnstileSiteKey,
         appearance: 'execute',
+        execution: 'execute',
         callback: (token) => {
           setStatus('ready')
           if (pendingResolveRef.current) {
@@ -60,10 +61,9 @@ export function useTurnstile() {
         'expired-callback': () => {
           readyTokenRef.current = null
           setStatus('waiting')
-          if (widgetIdRef.current && window.turnstile) {
-            window.turnstile.reset(widgetIdRef.current)
-            window.turnstile.execute(widgetIdRef.current)
-          }
+          pendingRejectRef.current?.(new Error('Turnstile verification expired. Please try again.'))
+          pendingResolveRef.current = null
+          pendingRejectRef.current = null
         },
         'error-callback': () => {
           setStatus('error')
@@ -113,8 +113,19 @@ export function useTurnstile() {
       pendingRejectRef.current = reject
       setStatus('checking')
 
-      if (window.turnstile && widgetId) {
+      if (!window.turnstile || !widgetId) {
+        pendingResolveRef.current = null
+        pendingRejectRef.current = null
+        reject(new Error('Turnstile is not ready. Please try again.'))
+        return
+      }
+
+      try {
         window.turnstile.execute(widgetId)
+      } catch (err) {
+        pendingResolveRef.current = null
+        pendingRejectRef.current = null
+        reject(err instanceof Error ? err : new Error('Turnstile verification failed.'))
       }
     })
   }, [])
@@ -123,7 +134,6 @@ export function useTurnstile() {
     readyTokenRef.current = null
     if (widgetIdRef.current && window.turnstile) {
       window.turnstile.reset(widgetIdRef.current)
-      window.turnstile.execute(widgetIdRef.current)
       setStatus('waiting')
     }
   }, [])

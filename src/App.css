@@ -333,6 +333,16 @@ select:focus {
   box-shadow: none;
 }
 
+.search-pill input,
+.range-inputs input,
+.status-field select {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
 input.has-field-error {
   border-color: rgba(255, 74, 134, 0.46);
   padding-right: calc(var(--space-5xl) + var(--space-xs));
