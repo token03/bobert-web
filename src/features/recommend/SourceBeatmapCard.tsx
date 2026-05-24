@@ -46,11 +46,12 @@ export function SourceBeatmapCard({ beatmap, onCopy }: SourceBeatmapCardProps) {
 
         <div className="stat-strip">
           <div className="stat-row stat-row-main">
-            <Stat label={<Star aria-label="Star" />} value={formatNumber(beatmap.stars, 2)} featured />
-            <Stat label={<Metronome aria-label="BPM" />} value={formatNumber(beatmap.bpm, 0)} featured />
-            <Stat label={<Clock aria-label="Length" />} value={formatLength(beatmap.total_length)} featured />
+            <Stat label={<Star aria-label="Star" strokeWidth={3} />} value={formatNumber(beatmap.stars, 2)} featured />
+            <Stat label={<Metronome aria-label="BPM" strokeWidth={3} />} value={formatNumber(beatmap.bpm, 0)} featured />
+            <Stat label={<Clock aria-label="Length" strokeWidth={3} />} value={formatLength(beatmap.total_length)} featured />
           </div>
           <div className="stat-side">
+            <div className="source-stat-separator" aria-hidden="true" />
             <div className="stat-row stat-row-sub">
               <Stat label="AR" value={formatFixedNumber(beatmap.ar, 1)} />
               <Stat label="CS" value={formatFixedNumber(beatmap.cs, 1)} />
