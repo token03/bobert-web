@@ -1,5 +1,5 @@
-import { Clock, Metronome, Star } from 'lucide-react'
-import type { KeyboardEvent } from 'react'
+import { Clock, Copy, Download, Metronome, Star } from 'lucide-react'
+import type { KeyboardEvent, MouseEvent } from 'react'
 import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatNumber, statusClass, statusLabel } from '../../shared/format'
 import type { BeatmapMetadata } from '../../shared/types'
 import { Stat } from '../../shared/ui/Stat'
@@ -8,9 +8,10 @@ import { beatmapUrl, cardCoverUrl, userUrl } from '../../shared/urls'
 type SourceBeatmapCardProps = {
   beatmap: BeatmapMetadata
   count: number
+  onCopy: (beatmapId: number) => Promise<void>
 }
 
-export function SourceBeatmapCard({ beatmap, count }: SourceBeatmapCardProps) {
+export function SourceBeatmapCard({ beatmap, count, onCopy }: SourceBeatmapCardProps) {
   const openBeatmap = () => window.open(beatmapUrl(beatmap), '_blank', 'noreferrer')
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if ((event.target as HTMLElement).closest('a, button')) {
@@ -49,18 +50,26 @@ export function SourceBeatmapCard({ beatmap, count }: SourceBeatmapCardProps) {
           </div>
         </div>
 
-        <div className="source-side">
-          <div className="stat-strip source-stat-strip">
-            <div className="stat-row stat-row-main">
-              <Stat label={<Star aria-label="Star" />} value={formatNumber(beatmap.stars, 2)} featured />
-              <Stat label={<Metronome aria-label="BPM" />} value={formatNumber(beatmap.bpm, 0)} featured />
-              <Stat label={<Clock aria-label="Length" />} value={formatLength(beatmap.total_length)} featured />
-            </div>
+        <div className="stat-strip">
+          <div className="stat-row stat-row-main">
+            <Stat label={<Star aria-label="Star" />} value={formatNumber(beatmap.stars, 2)} featured />
+            <Stat label={<Metronome aria-label="BPM" />} value={formatNumber(beatmap.bpm, 0)} featured />
+            <Stat label={<Clock aria-label="Length" />} value={formatLength(beatmap.total_length)} featured />
+          </div>
+          <div className="stat-side">
             <div className="stat-row stat-row-sub">
               <Stat label="AR" value={formatFixedNumber(beatmap.ar, 1)} />
               <Stat label="CS" value={formatFixedNumber(beatmap.cs, 1)} />
               <Stat label="OD" value={formatFixedNumber(beatmap.accuracy, 1)} />
               <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
+            </div>
+            <div className="row-actions" onClick={(event) => event.stopPropagation()}>
+              <button type="button" onClick={(event) => handleActionClick(event, () => onCopy(beatmap.beatmap_id))} aria-label="Copy beatmap ID" title="Copy ID">
+                <Copy />
+              </button>
+              <button type="button" onClick={(event) => handleActionClick(event, () => window.location.assign(`osu://b/${beatmap.beatmap_id}`))} aria-label="Open beatmap in osu!" title="Open in osu!">
+                <Download />
+              </button>
             </div>
           </div>
         </div>
@@ -71,6 +80,11 @@ export function SourceBeatmapCard({ beatmap, count }: SourceBeatmapCardProps) {
 
 function formatResults(count: number) {
   return `${count} ${count === 1 ? 'RESULT' : 'RESULTS'}`
+}
+
+function handleActionClick(event: MouseEvent<HTMLButtonElement>, action: () => void | Promise<void>) {
+  event.stopPropagation()
+  action()
 }
 
 function CreatorLink({ beatmap }: { beatmap: BeatmapMetadata }) {

@@ -170,12 +170,28 @@ export function RecommendPage() {
       <section className="results-panel">
         {error ? <p className="error-text">{error}</p> : null}
 
-        {response ? (
-          <>
-            <SourceBeatmapCard beatmap={response.query.metadata} count={response.count} />
-            {response.results.length > 0 ? (
+        <div className="result-list-wrap" aria-busy={isLoading}>
+          {response ? (
+            <>
+              <SourceBeatmapCard beatmap={response.query.metadata} count={response.count} onCopy={copyBeatmapId} />
+              {response.results.length > 0 ? (
+                <ResultsList
+                  beatmaps={response.results}
+                  onCopy={copyBeatmapId}
+                  onSearch={searchBeatmap}
+                  isLoading={isLoading}
+                  onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
+                  activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
+                  isPreviewPlaying={audio.isPlaying}
+                />
+              ) : (
+                <p className="empty-results">No results found</p>
+              )}
+            </>
+          ) : showDefaultResults ? (
+            resultBeatmaps.length > 0 ? (
               <ResultsList
-                beatmaps={response.results}
+                beatmaps={resultBeatmaps}
                 onCopy={copyBeatmapId}
                 onSearch={searchBeatmap}
                 isLoading={isLoading}
@@ -185,27 +201,14 @@ export function RecommendPage() {
               />
             ) : (
               <p className="empty-results">No results found</p>
-            )}
-          </>
-        ) : showDefaultResults ? (
-          resultBeatmaps.length > 0 ? (
-            <ResultsList
-              beatmaps={resultBeatmaps}
-              onCopy={copyBeatmapId}
-              onSearch={searchBeatmap}
-              isLoading={isLoading}
-              onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
-              activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
-              isPreviewPlaying={audio.isPlaying}
-            />
-          ) : (
-            <p className="empty-results">No results found</p>
-          )
-        ) : defaultLoading ? (
-          <p className="empty-results">Loading recommendations</p>
-        ) : error ? null : (
-          <p className="empty-results">Loading recommendations</p>
-        )}
+            )
+          ) : defaultLoading ? (
+            <p className="empty-results">Loading recommendations</p>
+          ) : error ? null : (
+            <p className="empty-results">Loading recommendations</p>
+          )}
+          {isLoading ? <div className="results-loading-overlay" aria-hidden="true" /> : null}
+        </div>
       </section>
 
       {audio.activeBeatmap ? (

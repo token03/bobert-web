@@ -13,22 +13,19 @@ type ResultsListProps = {
 
 export function ResultsList({ beatmaps, onCopy, onSearch, isLoading, onPlayPreview, activePreviewSetId, isPreviewPlaying }: ResultsListProps) {
   return (
-    <div className="result-list-wrap" aria-busy={isLoading}>
-      <div className="result-list">
-        {beatmaps.map((beatmap) => (
-          <BeatmapCard
-            key={beatmap.beatmap_id}
-            beatmap={beatmap}
-            onCopy={onCopy}
-            onSearch={onSearch}
-            isLoading={isLoading}
-            onPlayPreview={onPlayPreview}
-            activePreviewSetId={activePreviewSetId}
-            isPreviewPlaying={isPreviewPlaying}
-          />
-        ))}
-      </div>
-      {isLoading ? <div className="results-loading-overlay" aria-hidden="true" /> : null}
+    <div className="result-list">
+      {beatmaps.map((beatmap) => (
+        <BeatmapCard
+          key={beatmap.beatmap_id}
+          beatmap={beatmap}
+          onCopy={onCopy}
+          onSearch={onSearch}
+          isLoading={isLoading}
+          onPlayPreview={onPlayPreview}
+          activePreviewSetId={activePreviewSetId}
+          isPreviewPlaying={isPreviewPlaying}
+        />
+      ))}
     </div>
   )
 }
