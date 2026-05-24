@@ -62,7 +62,7 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
             <RangeFields label="BPM" min={values.minBpm} max={values.maxBpm} setMin={(value) => form.setValue('minBpm', value)} setMax={(value) => form.setValue('maxBpm', value)} />
 
             <label className="field status-field">
-              <span>Status</span>
+              <span>Status:</span>
               <select {...form.register('status')}>
                 <option value="">Any</option>
                 <option value="-2">Graveyard</option>

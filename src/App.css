@@ -251,10 +251,12 @@ select:focus {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   overflow: hidden;
+  height: var(--control-height);
   min-height: var(--control-height);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--input);
+  box-sizing: border-box;
 }
 
 .search-pill:focus-within {
@@ -288,11 +290,14 @@ select:focus {
 
 .search-button.primary-button {
   width: 58px;
-  min-height: var(--control-height);
+  height: 100%;
+  min-height: 0;
   border-left: 1px solid var(--border);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: var(--surface-strong);
+  box-sizing: border-box;
   color: var(--text);
+  padding: 0;
 }
 
 .search-button.primary-button:not(:disabled):hover {
@@ -464,8 +469,12 @@ button:disabled {
 
 .filter-controls .ghost-button {
   width: var(--control-height);
+  height: var(--control-height);
   min-height: var(--control-height);
   border-radius: var(--radius-sm);
+  background: var(--surface-strong);
+  box-sizing: border-box;
+  padding: 0;
 }
 
 .ghost-button:hover {
