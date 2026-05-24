@@ -75,17 +75,22 @@
 }
 
 .control-panel {
-  position: sticky;
-  top: var(--space-xl);
-  z-index: 10;
   display: grid;
   gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--row);
   padding: var(--space-lg);
-  box-shadow: 0 calc(var(--space-xl) * -1) 0 var(--bg), 0 var(--space-xl) 0 var(--bg), var(--shadow);
+  box-shadow: var(--shadow);
+}
+
+.sticky-search-wrap {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: var(--space-xl);
+  background: var(--bg);
+  padding: var(--space-xl) 0;
 }
 
 .primary-controls,

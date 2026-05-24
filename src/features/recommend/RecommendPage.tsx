@@ -151,13 +151,15 @@ export function RecommendPage() {
   const resultBeatmaps = response?.results ?? defaultResponse?.results ?? []
   const showDefaultResults = !response && defaultResponse !== null
   const recommendForm = (
-    <RecommendForm
-      form={form}
-      isLoading={isLoading}
-      turnstileEnabled={turnstile.enabled}
-      turnstileRef={turnstile.containerRef}
-      onSubmit={runRecommend}
-    />
+    <div className="sticky-search-wrap">
+      <RecommendForm
+        form={form}
+        isLoading={isLoading}
+        turnstileEnabled={turnstile.enabled}
+        turnstileRef={turnstile.containerRef}
+        onSubmit={runRecommend}
+      />
+    </div>
   )
 
   async function copyBeatmapId(beatmapId: number) {
