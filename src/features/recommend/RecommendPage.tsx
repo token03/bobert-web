@@ -187,8 +187,14 @@ export function RecommendPage() {
     }, 500)
   }
 
-  async function resetRecommendations() {
+  async function resetRecommendations(values: RecommendFormValues) {
     clearRangeSearchTimeout()
+
+    if (parseBeatmapId(values.beatmapInput)) {
+      await runRecommend(values, 'replace', false)
+      return
+    }
+
     recommendRequestId.current += 1
     defaultRequestId.current += 1
     const requestId = defaultRequestId.current
@@ -237,8 +243,8 @@ export function RecommendPage() {
           clearRangeSearchTimeout()
           runAutoRecommend(values)
         }}
-        onReset={() => {
-          void resetRecommendations()
+        onReset={(values) => {
+          void resetRecommendations(values)
         }}
       />
     </div>

@@ -13,7 +13,7 @@ type RecommendFormProps = {
   onSubmit: (values: RecommendFormValues) => Promise<void>
   onRangeChange: (values: RecommendFormValues) => void
   onStatusChange: (values: RecommendFormValues) => void
-  onReset: () => void
+  onReset: (values: RecommendFormValues) => void
 }
 
 type RangeFieldName = 'minSr' | 'maxSr' | 'minLength' | 'maxLength' | 'minBpm' | 'maxBpm'
@@ -26,8 +26,9 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
   const status = form.register('status')
 
   function resetForm() {
-    form.reset(defaultFilters)
-    onReset()
+    const nextValues = { ...defaultFilters, beatmapInput: form.getValues('beatmapInput') }
+    form.reset(nextValues)
+    onReset(nextValues)
   }
 
   function updateRange(field: RangeFieldName, value: string) {
