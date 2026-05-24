@@ -501,6 +501,7 @@ button:disabled {
   min-height: 132px;
   aspect-ratio: 10 / 3;
   overflow: hidden;
+  border-radius: 0;
   background: var(--surface);
 }
 
@@ -642,6 +643,7 @@ button:disabled {
   min-height: var(--cover-size);
   overflow: hidden;
   border: 0;
+  border-radius: 0;
   background: var(--surface);
   padding: 0;
   text-align: left;
@@ -746,7 +748,7 @@ button:disabled {
   min-width: 0;
   margin-left: calc(var(--card-overlap) * -1);
   border: 1px solid transparent;
-  border-radius: 0;
+  border-radius: var(--radius-md);
   background: var(--row);
   padding: calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--radius-md) - 1px);
 }
@@ -1268,7 +1270,7 @@ button:disabled {
   .map-content {
     margin-top: calc(var(--card-overlap) * -1);
     margin-left: 0;
-    border-radius: 0;
+    border-radius: var(--radius-md);
     padding: calc(var(--radius-md) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px);
   }
 
