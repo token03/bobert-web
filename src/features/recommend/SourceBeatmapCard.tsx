@@ -41,11 +41,11 @@ export function SourceBeatmapCard({ beatmap, count }: SourceBeatmapCardProps) {
                 <span>{beatmap.version ?? 'Unknown difficulty'}</span>
               </div>
             </div>
-            <div className="source-meta">
-              <strong className="source-results">{formatResults(count)}</strong>
-              <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
-              <CreatorLink beatmap={beatmap} />
-            </div>
+          </div>
+          <div className="match-line source-match-line">
+            <strong className="source-results">{formatResults(count)}</strong>
+            <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
+            <CreatorLink beatmap={beatmap} />
           </div>
         </div>
 
@@ -70,7 +70,7 @@ export function SourceBeatmapCard({ beatmap, count }: SourceBeatmapCardProps) {
 }
 
 function formatResults(count: number) {
-  return `(${count} ${count === 1 ? 'result' : 'results'})`
+  return `${count} ${count === 1 ? 'RESULT' : 'RESULTS'}`
 }
 
 function CreatorLink({ beatmap }: { beatmap: BeatmapMetadata }) {
