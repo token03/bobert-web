@@ -12,6 +12,10 @@ export function coverUrl(beatmapsetId: number, twoX = false): string {
   return `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/list${twoX ? '@2x' : ''}.jpg`
 }
 
+export function cardCoverUrl(beatmapsetId: number): string {
+  return `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/card@2x.jpg`
+}
+
 export function userUrl(userId: number): string {
   return `https://osu.ppy.sh/users/${userId}`
 }
