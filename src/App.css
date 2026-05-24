@@ -978,6 +978,14 @@ button:disabled {
   transition: opacity 0.12s ease, color 0.12s ease;
 }
 
+.beatmap-row:hover .row-actions button,
+.beatmap-row:hover .row-actions a,
+.beatmap-row .row-actions:focus-within button,
+.beatmap-row .row-actions:focus-within a {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 .row-actions svg {
   width: 15px;
   height: 15px;
@@ -994,6 +1002,12 @@ button:disabled {
 .row-actions button:disabled:hover {
   color: var(--muted-soft);
   cursor: not-allowed;
+}
+
+.beatmap-row:hover .row-actions button:disabled,
+.beatmap-row .row-actions:focus-within button:disabled {
+  opacity: 0.42;
+  pointer-events: none;
 }
 
 .audio-pill {
