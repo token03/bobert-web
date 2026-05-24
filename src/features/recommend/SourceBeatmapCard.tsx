@@ -1,17 +1,16 @@
 import { Clock, Copy, Download, Metronome, Star } from 'lucide-react'
 import type { KeyboardEvent, MouseEvent } from 'react'
-import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatNumber, statusClass, statusLabel } from '../../shared/format'
+import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatNumber } from '../../shared/format'
 import type { BeatmapMetadata } from '../../shared/types'
 import { Stat } from '../../shared/ui/Stat'
-import { beatmapUrl, cardCoverUrl, userUrl } from '../../shared/urls'
+import { beatmapUrl, cardCoverUrl } from '../../shared/urls'
 
 type SourceBeatmapCardProps = {
   beatmap: BeatmapMetadata
-  count: number
   onCopy: (beatmapId: number) => Promise<void>
 }
 
-export function SourceBeatmapCard({ beatmap, count, onCopy }: SourceBeatmapCardProps) {
+export function SourceBeatmapCard({ beatmap, onCopy }: SourceBeatmapCardProps) {
   const openBeatmap = () => window.open(beatmapUrl(beatmap), '_blank', 'noreferrer')
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if ((event.target as HTMLElement).closest('a, button')) {
@@ -43,11 +42,6 @@ export function SourceBeatmapCard({ beatmap, count, onCopy }: SourceBeatmapCardP
               </div>
             </div>
           </div>
-          <div className="match-line source-match-line">
-            <strong className="source-results">{formatResults(count)}</strong>
-            <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
-            <CreatorLink beatmap={beatmap} />
-          </div>
         </div>
 
         <div className="stat-strip">
@@ -78,28 +72,7 @@ export function SourceBeatmapCard({ beatmap, count, onCopy }: SourceBeatmapCardP
   )
 }
 
-function formatResults(count: number) {
-  return `${count} ${count === 1 ? 'RESULT' : 'RESULTS'}`
-}
-
 function handleActionClick(event: MouseEvent<HTMLButtonElement>, action: () => void | Promise<void>) {
   event.stopPropagation()
   action()
-}
-
-function CreatorLink({ beatmap }: { beatmap: BeatmapMetadata }) {
-  const creatorName = beatmap.creator ?? beatmap.user_id ?? 'unknown'
-
-  if (beatmap.user_id) {
-    return (
-      <span>
-        mapped by{' '}
-        <a className="mapper-link" href={userUrl(beatmap.user_id)} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>
-          {creatorName}
-        </a>
-      </span>
-    )
-  }
-
-  return <span>mapped by {creatorName}</span>
 }
