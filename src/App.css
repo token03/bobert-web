@@ -480,7 +480,7 @@ button:disabled {
 
 .source-card {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: var(--cover-size) minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2xl);
   margin: 0 0 var(--space-3xl);
@@ -496,14 +496,37 @@ button:disabled {
   background: var(--row-hover);
 }
 
-.source-label {
-  align-self: start;
+.source-cover {
+  width: var(--cover-size);
+  height: var(--cover-size);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.source-cover img,
+.source-cover .cover-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.source-cover img {
+  object-fit: cover;
+}
+
+.source-main {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.source-main span,
+.source-card small {
   color: var(--muted);
   font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 700;
   text-transform: uppercase;
-  white-space: nowrap;
 }
 
 .source-results {
@@ -521,6 +544,15 @@ button:disabled {
   letter-spacing: 0.08em;
   padding: var(--space-md) var(--space-xl);
   text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.source-title {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 850;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -677,15 +709,10 @@ button:disabled {
 
 .map-content {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, auto);
+  grid-template-columns: minmax(0, 1fr) 300px;
   align-items: center;
   gap: var(--space-2xl);
   min-width: 0;
-}
-
-.source-map-content {
-  grid-template-columns: minmax(0, 1fr) minmax(340px, auto);
-  width: 100%;
 }
 
 .map-main {
@@ -822,14 +849,9 @@ button:disabled {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  flex-wrap: wrap;
   gap: var(--space-3xl);
-  width: 100%;
-  min-width: 340px;
-}
-
-.source-stat-strip {
-  min-width: 340px;
+  width: 300px;
+  min-width: 300px;
 }
 
 .stat-row {
@@ -847,8 +869,8 @@ button:disabled {
 }
 
 .stat-row-sub {
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: calc(var(--space-md) + var(--space-2xs));
 }
 
@@ -866,7 +888,7 @@ button:disabled {
 }
 
 .stat-row-sub .stat-item {
-  grid-template-columns: auto auto;
+  grid-template-columns: 2ch 4ch;
   align-items: baseline;
   justify-content: start;
   gap: var(--space-sm);
