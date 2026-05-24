@@ -30,9 +30,33 @@ export function useTurnstile() {
   const containerRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
   const readyTokenRef = useRef<string | null>(null)
+  const isCheckingRef = useRef(false)
   const pendingResolveRef = useRef<((token: string) => void) | null>(null)
   const pendingRejectRef = useRef<((error: Error) => void) | null>(null)
   const [, setStatus] = useState(turnstileSiteKey ? 'waiting' : 'disabled')
+
+  const rejectPending = useCallback((error: Error) => {
+    isCheckingRef.current = false
+    pendingRejectRef.current?.(error)
+    pendingResolveRef.current = null
+    pendingRejectRef.current = null
+  }, [])
+
+  const executeWidget = useCallback(() => {
+    const widgetId = widgetIdRef.current
+
+    if (!window.turnstile || !widgetId || isCheckingRef.current || readyTokenRef.current) {
+      return
+    }
+
+    try {
+      isCheckingRef.current = true
+      setStatus('checking')
+      window.turnstile.execute(widgetId)
+    } catch (err) {
+      rejectPending(err instanceof Error ? err : new Error('Turnstile verification failed.'))
+    }
+  }, [rejectPending])
 
   useEffect(() => {
     if (!turnstileSiteKey || !containerRef.current || widgetIdRef.current) {
@@ -49,30 +73,29 @@ export function useTurnstile() {
         appearance: 'execute',
         execution: 'execute',
         callback: (token) => {
+          isCheckingRef.current = false
           setStatus('ready')
           if (pendingResolveRef.current) {
             pendingResolveRef.current(token)
+            pendingResolveRef.current = null
+            pendingRejectRef.current = null
           } else {
             readyTokenRef.current = token
           }
-          pendingResolveRef.current = null
-          pendingRejectRef.current = null
         },
         'expired-callback': () => {
           readyTokenRef.current = null
           setStatus('waiting')
-          pendingRejectRef.current?.(new Error('Turnstile verification expired. Please try again.'))
-          pendingResolveRef.current = null
-          pendingRejectRef.current = null
+          rejectPending(new Error('Turnstile verification expired. Please try again.'))
+          executeWidget()
         },
         'error-callback': () => {
           setStatus('error')
           readyTokenRef.current = null
-          pendingRejectRef.current?.(new Error('Turnstile verification failed.'))
-          pendingResolveRef.current = null
-          pendingRejectRef.current = null
+          rejectPending(new Error('Turnstile verification failed.'))
         },
       })
+      executeWidget()
       return true
     }
 
@@ -97,7 +120,7 @@ export function useTurnstile() {
       script.onload = null
       script.onerror = null
     }
-  }, [])
+  }, [executeWidget, rejectPending])
 
   const getToken = useCallback((): Promise<string> => {
     if (readyTokenRef.current) {
@@ -111,32 +134,29 @@ export function useTurnstile() {
 
       pendingResolveRef.current = resolve
       pendingRejectRef.current = reject
-      setStatus('checking')
 
       if (!window.turnstile || !widgetId) {
-        pendingResolveRef.current = null
-        pendingRejectRef.current = null
-        reject(new Error('Turnstile is not ready. Please try again.'))
+        rejectPending(new Error('Turnstile is not ready. Please try again.'))
         return
       }
 
-      try {
-        window.turnstile.execute(widgetId)
-      } catch (err) {
-        pendingResolveRef.current = null
-        pendingRejectRef.current = null
-        reject(err instanceof Error ? err : new Error('Turnstile verification failed.'))
-      }
+      executeWidget()
     })
-  }, [])
+  }, [executeWidget, rejectPending])
 
   const reset = useCallback(() => {
     readyTokenRef.current = null
     if (widgetIdRef.current && window.turnstile) {
-      window.turnstile.reset(widgetIdRef.current)
-      setStatus('waiting')
+      try {
+        isCheckingRef.current = false
+        window.turnstile.reset(widgetIdRef.current)
+        setStatus('waiting')
+        executeWidget()
+      } catch (err) {
+        rejectPending(err instanceof Error ? err : new Error('Turnstile verification failed.'))
+      }
     }
-  }, [])
+  }, [executeWidget, rejectPending])
 
   return {
     containerRef,
