@@ -338,7 +338,7 @@ select:focus {
 .status-field select {
   color: var(--text);
   font-size: 13px;
-  font-weight: 450;
+  font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1;
 }
