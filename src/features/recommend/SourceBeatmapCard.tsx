@@ -1,6 +1,9 @@
-import { displayArtist, displayTitle, resultsLabel } from '../../shared/format'
+import { Clock, Metronome, Star } from 'lucide-react'
+import type { KeyboardEvent } from 'react'
+import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatNumber, resultsLabel, statusClass, statusLabel } from '../../shared/format'
 import type { BeatmapMetadata } from '../../shared/types'
-import { beatmapUrl } from '../../shared/urls'
+import { Stat } from '../../shared/ui/Stat'
+import { beatmapUrl, userUrl } from '../../shared/urls'
 
 type SourceBeatmapCardProps = {
   beatmap: BeatmapMetadata
@@ -9,16 +12,68 @@ type SourceBeatmapCardProps = {
 }
 
 export function SourceBeatmapCard({ beatmap, count, label }: SourceBeatmapCardProps) {
+  const openBeatmap = () => window.open(beatmapUrl(beatmap), '_blank', 'noreferrer')
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if ((event.target as HTMLElement).closest('a, button')) {
+      return
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      openBeatmap()
+    }
+  }
+
   return (
-    <article className="source-card">
-      <div className="source-main">
-        <span>{label}</span>
-        <a href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
-          {displayArtist(beatmap)} - {displayTitle(beatmap)}
-        </a>
-        <small>{beatmap.version ?? 'Unknown difficulty'}</small>
+    <article className="source-card clickable-card" role="link" tabIndex={0} onClick={openBeatmap} onKeyDown={handleCardKeyDown}>
+      <span className="source-label">{label}</span>
+      <div className="map-content source-map-content">
+        <div className="map-main">
+          <div className="title-line">
+            <span className="map-title">{displayTitle(beatmap)}</span>
+          </div>
+          <div className="artist-line">by {displayArtist(beatmap)}</div>
+          <div className="version-line">
+            <span>{beatmap.version ?? 'Unknown difficulty'}</span>
+          </div>
+          <div className="match-line">
+            <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
+            <CreatorLink beatmap={beatmap} />
+          </div>
+        </div>
+
+        <div className="stat-strip source-stat-strip">
+          <div className="stat-row stat-row-main">
+            <Stat label={<Star aria-label="Star" />} value={formatNumber(beatmap.stars, 2)} featured />
+            <Stat label={<Metronome aria-label="BPM" />} value={formatNumber(beatmap.bpm, 0)} featured />
+            <Stat label={<Clock aria-label="Length" />} value={formatLength(beatmap.total_length)} featured />
+          </div>
+          <div className="stat-row stat-row-sub">
+            <Stat label="AR" value={formatFixedNumber(beatmap.ar, 1)} />
+            <Stat label="CS" value={formatFixedNumber(beatmap.cs, 1)} />
+            <Stat label="OD" value={formatFixedNumber(beatmap.accuracy, 1)} />
+            <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
+          </div>
+        </div>
       </div>
-      <strong>{resultsLabel(count)}</strong>
+      <strong className="source-results">{resultsLabel(count)}</strong>
     </article>
   )
+}
+
+function CreatorLink({ beatmap }: { beatmap: BeatmapMetadata }) {
+  const creatorName = beatmap.creator ?? beatmap.user_id ?? 'unknown'
+
+  if (beatmap.user_id) {
+    return (
+      <span>
+        mapped by{' '}
+        <a className="mapper-link" href={userUrl(beatmap.user_id)} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>
+          {creatorName}
+        </a>
+      </span>
+    )
+  }
+
+  return <span>mapped by {creatorName}</span>
 }

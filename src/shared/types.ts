@@ -5,6 +5,7 @@ export type BeatmapMetadata = {
   title: string | null
   creator: string | null
   creator_id?: number | null
+  user_id?: number | null
   version: string | null
   status: string | null
   stars: number | null

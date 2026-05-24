@@ -1,4 +1,5 @@
 import { Clock, Copy, Download, Metronome, Pause, Play, Search, Star } from 'lucide-react'
+import type { KeyboardEvent, MouseEvent } from 'react'
 import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatMatch, formatNumber, statusClass, statusLabel } from '../../shared/format'
 import { Stat } from '../../shared/ui/Stat'
 import type { BeatmapMetadata } from '../../shared/types'
@@ -18,14 +19,28 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPrevie
   const hasPreview = beatmap.beatmapset_id !== null
   const isActivePreview = hasPreview && activePreviewSetId === beatmap.beatmapset_id
   const isCoverActive = isActivePreview && isPreviewPlaying
+  const openBeatmap = () => window.open(beatmapUrl(beatmap), '_blank', 'noreferrer')
+  const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if ((event.target as HTMLElement).closest('a, button')) {
+      return
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      openBeatmap()
+    }
+  }
 
   return (
-    <article className="beatmap-row">
+    <article className="beatmap-row clickable-card" role="link" tabIndex={0} onClick={openBeatmap} onKeyDown={handleCardKeyDown}>
       <button
         className={isCoverActive ? 'cover-preview is-audio-active' : 'cover-preview'}
         type="button"
         disabled={!hasPreview}
-        onClick={() => onPlayPreview(beatmap)}
+        onClick={(event) => {
+          event.stopPropagation()
+          onPlayPreview(beatmap)
+        }}
         aria-label={hasPreview ? (isCoverActive ? 'Pause preview' : 'Play preview') : 'No preview available'}
         title={hasPreview ? (isCoverActive ? 'Pause preview' : 'Play preview') : 'No preview available'}
       >
@@ -46,9 +61,7 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPrevie
       <div className="map-content">
         <div className="map-main">
           <div className="title-line">
-            <a className="map-title" href={beatmapUrl(beatmap)} target="_blank" rel="noreferrer">
-              {displayTitle(beatmap)}
-            </a>
+            <span className="map-title">{displayTitle(beatmap)}</span>
           </div>
           <div className="artist-line">by {displayArtist(beatmap)}</div>
           <div className="version-line">
@@ -74,14 +87,14 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPrevie
               <Stat label="OD" value={formatFixedNumber(beatmap.accuracy, 1)} />
               <Stat label="HP" value={formatFixedNumber(beatmap.drain, 1)} />
             </div>
-            <div className="row-actions">
-              <button type="button" disabled={isLoading} onClick={() => onSearch(beatmap.beatmap_id)} aria-label="Search similar" title="Search similar">
+            <div className="row-actions" onClick={(event) => event.stopPropagation()}>
+              <button type="button" disabled={isLoading} onClick={(event) => handleActionClick(event, () => onSearch(beatmap.beatmap_id))} aria-label="Search similar" title="Search similar">
                 <Search />
               </button>
-              <button type="button" onClick={() => onCopy(beatmap.beatmap_id)} aria-label="Copy beatmap ID" title="Copy ID">
+              <button type="button" onClick={(event) => handleActionClick(event, () => onCopy(beatmap.beatmap_id))} aria-label="Copy beatmap ID" title="Copy ID">
                 <Copy />
               </button>
-              <button type="button" onClick={() => window.location.assign(`osu://b/${beatmap.beatmap_id}`)} aria-label="Open beatmap in osu!" title="Open in osu!">
+              <button type="button" onClick={(event) => handleActionClick(event, () => window.location.assign(`osu://b/${beatmap.beatmap_id}`))} aria-label="Open beatmap in osu!" title="Open in osu!">
                 <Download />
               </button>
             </div>
@@ -92,14 +105,24 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPrevie
   )
 }
 
+function handleActionClick(event: MouseEvent<HTMLButtonElement>, action: () => void | Promise<void>) {
+  event.stopPropagation()
+  action()
+}
+
 function CreatorLink({ beatmap }: { beatmap: BeatmapMetadata }) {
-  if (beatmap.creator_id) {
+  const creatorName = beatmap.creator ?? beatmap.user_id ?? 'unknown'
+
+  if (beatmap.user_id) {
     return (
-      <a href={userUrl(beatmap.creator_id)} target="_blank" rel="noreferrer">
-        mapped by {beatmap.creator ?? beatmap.creator_id}
-      </a>
+      <span>
+        mapped by{' '}
+        <a className="mapper-link" href={userUrl(beatmap.user_id)} target="_blank" rel="noreferrer" onClick={(event) => event.stopPropagation()}>
+          {creatorName}
+        </a>
+      </span>
     )
   }
 
-  return <span>mapped by {beatmap.creator ?? 'unknown'}</span>
+  return <span>mapped by {creatorName}</span>
 }
