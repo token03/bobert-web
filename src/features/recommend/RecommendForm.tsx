@@ -1,7 +1,7 @@
 import { Loader, RotateCcw, Search, XCircle } from 'lucide-react'
 import type { RefObject } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { normalizeBeatmapInput } from './filters'
+import { defaultFilters, normalizeBeatmapInput } from './filters'
 import type { RecommendFormValues } from './filters'
 import { RangeFields } from './RangeFields'
 
@@ -20,7 +20,7 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
   const beatmapInput = form.register('beatmapInput')
 
   function resetForm() {
-    form.reset()
+    form.reset(defaultFilters)
   }
 
   return (
