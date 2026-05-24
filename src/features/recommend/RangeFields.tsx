@@ -16,22 +16,25 @@ export function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProp
   return (
     <div className="range-field">
       <span>{label}</span>
-      <input
-        inputMode="decimal"
-        type="text"
-        value={min}
-        onChange={(event) => updateNumber(event.target.value, setMin)}
-        placeholder="min"
-        aria-label={`${label} minimum`}
-      />
-      <input
-        inputMode="decimal"
-        type="text"
-        value={max}
-        onChange={(event) => updateNumber(event.target.value, setMax)}
-        placeholder="max"
-        aria-label={`${label} maximum`}
-      />
+      <span className="range-inputs">
+        <input
+          inputMode="decimal"
+          type="text"
+          value={min}
+          onChange={(event) => updateNumber(event.target.value, setMin)}
+          placeholder="min"
+          aria-label={`${label} minimum`}
+        />
+        <span aria-hidden="true">|</span>
+        <input
+          inputMode="decimal"
+          type="text"
+          value={max}
+          onChange={(event) => updateNumber(event.target.value, setMax)}
+          placeholder="max"
+          aria-label={`${label} maximum`}
+        />
+      </span>
     </div>
   )
 }

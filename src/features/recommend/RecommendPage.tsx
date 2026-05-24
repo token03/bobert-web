@@ -174,8 +174,8 @@ export function RecommendPage() {
         <div className="result-list-wrap" aria-busy={isLoading}>
           {response ? (
             <>
-              <SourceBeatmapCard beatmap={response.query.metadata} onCopy={copyBeatmapId} />
               {recommendForm}
+              <SourceBeatmapCard beatmap={response.query.metadata} onCopy={copyBeatmapId} />
               {response.results.length > 0 ? (
                 <ResultsList
                   beatmaps={response.results}

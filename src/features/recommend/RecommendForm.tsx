@@ -1,11 +1,9 @@
-import { ChevronDown, ChevronUp, Loader, RotateCcw, Search, XCircle } from 'lucide-react'
-import { useState } from 'react'
+import { Loader, RotateCcw, Search, XCircle } from 'lucide-react'
 import type { RefObject } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { defaultFilters, normalizeBeatmapInput } from './filters'
+import { normalizeBeatmapInput } from './filters'
 import type { RecommendFormValues } from './filters'
 import { RangeFields } from './RangeFields'
-import { SliderRangeFields } from './SliderRangeFields'
 
 type RecommendFormProps = {
   form: UseFormReturn<RecommendFormValues>
@@ -16,15 +14,13 @@ type RecommendFormProps = {
 }
 
 export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef, onSubmit }: RecommendFormProps) {
-  const [advancedOpen, setAdvancedOpen] = useState(false)
   const values = form.watch()
   const beatmapError = form.formState.errors.beatmapInput?.message
   const submitDisabled = isLoading || form.formState.isSubmitting
   const beatmapInput = form.register('beatmapInput')
 
   function resetForm() {
-    form.reset(defaultFilters)
-    setAdvancedOpen(false)
+    form.reset()
   }
 
   return (
@@ -32,7 +28,7 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
       <form className="control-panel" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="primary-controls">
           <label className="field beatmap-field search-field">
-            <span>Search</span>
+            <span className="sr-only">Search</span>
             <span className="input-with-status">
               <span className="search-pill">
                 <input
@@ -85,29 +81,6 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
             </button>
           </div>
         </div>
-
-        <button
-          className="advanced-toggle"
-          type="button"
-          aria-expanded={advancedOpen}
-          aria-label={advancedOpen ? 'Hide advanced stats' : 'Show advanced stats'}
-          onClick={() => setAdvancedOpen((open) => !open)}
-        >
-          {advancedOpen ? <ChevronUp /> : <ChevronDown />}
-        </button>
-
-        {advancedOpen ? (
-          <div className="advanced-filters">
-            <SliderRangeFields label="AR" min={values.minAr} max={values.maxAr} setMin={(value) => form.setValue('minAr', value)} setMax={(value) => form.setValue('maxAr', value)} />
-            <SliderRangeFields label="CS" min={values.minCs} max={values.maxCs} setMin={(value) => form.setValue('minCs', value)} setMax={(value) => form.setValue('maxCs', value)} />
-            <SliderRangeFields label="OD" min={values.minOd} max={values.maxOd} setMin={(value) => form.setValue('minOd', value)} setMax={(value) => form.setValue('maxOd', value)} />
-            <SliderRangeFields label="HP" min={values.minHp} max={values.maxHp} setMin={(value) => form.setValue('minHp', value)} setMax={(value) => form.setValue('maxHp', value)} />
-            <label className="check-field">
-              <input type="checkbox" {...form.register('excludeSameSet')} />
-              <span>Exclude same set</span>
-            </label>
-          </div>
-        ) : null}
 
         {turnstileEnabled ? <div className="turnstile-hidden" ref={turnstileRef} /> : null}
       </form>
