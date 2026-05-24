@@ -11,16 +11,28 @@ type RecommendFormProps = {
   turnstileEnabled: boolean
   turnstileRef: RefObject<HTMLDivElement | null>
   onSubmit: (values: RecommendFormValues) => Promise<void>
+  onRangeChange: (values: RecommendFormValues) => void
+  onStatusChange: (values: RecommendFormValues) => void
+  onReset: () => void
 }
 
-export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef, onSubmit }: RecommendFormProps) {
+type RangeFieldName = 'minSr' | 'maxSr' | 'minLength' | 'maxLength' | 'minBpm' | 'maxBpm'
+
+export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef, onSubmit, onRangeChange, onStatusChange, onReset }: RecommendFormProps) {
   const values = form.watch()
   const beatmapError = form.formState.errors.beatmapInput?.message
   const submitDisabled = isLoading || form.formState.isSubmitting
   const beatmapInput = form.register('beatmapInput')
+  const status = form.register('status')
 
   function resetForm() {
     form.reset(defaultFilters)
+    onReset()
+  }
+
+  function updateRange(field: RangeFieldName, value: string) {
+    form.setValue(field, value)
+    onRangeChange({ ...form.getValues(), [field]: value })
   }
 
   return (
@@ -57,13 +69,19 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
           </label>
 
           <div className="filter-controls">
-            <RangeFields label="Star" min={values.minSr} max={values.maxSr} setMin={(value) => form.setValue('minSr', value)} setMax={(value) => form.setValue('maxSr', value)} />
-            <RangeFields label="Length" min={values.minLength} max={values.maxLength} setMin={(value) => form.setValue('minLength', value)} setMax={(value) => form.setValue('maxLength', value)} />
-            <RangeFields label="BPM" min={values.minBpm} max={values.maxBpm} setMin={(value) => form.setValue('minBpm', value)} setMax={(value) => form.setValue('maxBpm', value)} />
+            <RangeFields label="Star" min={values.minSr} max={values.maxSr} setMin={(value) => updateRange('minSr', value)} setMax={(value) => updateRange('maxSr', value)} />
+            <RangeFields label="Length" min={values.minLength} max={values.maxLength} setMin={(value) => updateRange('minLength', value)} setMax={(value) => updateRange('maxLength', value)} />
+            <RangeFields label="BPM" min={values.minBpm} max={values.maxBpm} setMin={(value) => updateRange('minBpm', value)} setMax={(value) => updateRange('maxBpm', value)} />
 
             <label className="field status-field">
               <span>Status:</span>
-              <select {...form.register('status')}>
+              <select
+                {...status}
+                onChange={(event) => {
+                  status.onChange(event)
+                  onStatusChange({ ...form.getValues(), status: event.target.value })
+                }}
+              >
                 <option value="">Any</option>
                 <option value="-2">Graveyard</option>
                 <option value="-1">WIP</option>

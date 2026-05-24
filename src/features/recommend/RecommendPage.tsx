@@ -5,7 +5,7 @@ import { useTurnstile } from '../turnstile/useTurnstile'
 import { fetchDefaultRecommendations } from '../../shared/api'
 import { copyText } from '../../shared/copy'
 import type { BeatmapMetadata, DefaultRecommendResponse, RecommendResponse } from '../../shared/types'
-import { buildRecommendRequest, defaultFilters, normalizeBeatmapInput } from './filters'
+import { buildRecommendRequest, defaultFilters, normalizeBeatmapInput, parseBeatmapId } from './filters'
 import type { RecommendFormValues } from './filters'
 import { RecommendForm } from './RecommendForm'
 import { readCachedRecommendation, recommendSearchParams, valuesFromRecommendSearch, writeCachedRecommendation } from './recommendHistory'
@@ -27,7 +27,16 @@ export function RecommendPage() {
   const form = useRecommendForm()
   const audio = useAudioPreview({ onError: setError })
   const defaultRequestId = useRef(0)
+  const recommendRequestId = useRef(0)
+  const rangeSearchTimeout = useRef<number | null>(null)
   const isLoading = isRunning || recommend.isPending
+
+  function clearRangeSearchTimeout() {
+    if (rangeSearchTimeout.current !== null) {
+      window.clearTimeout(rangeSearchTimeout.current)
+      rangeSearchTimeout.current = null
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -88,6 +97,10 @@ export function RecommendPage() {
 
     return () => {
       cancelled = true
+      if (rangeSearchTimeout.current !== null) {
+        window.clearTimeout(rangeSearchTimeout.current)
+        rangeSearchTimeout.current = null
+      }
       window.removeEventListener('popstate', restoreFromLocation)
     }
   }, [form])
@@ -115,7 +128,9 @@ export function RecommendPage() {
     })
   }
 
-  async function runRecommend(values: RecommendFormValues, historyMode: HistoryMode = 'push') {
+  async function runRecommend(values: RecommendFormValues, historyMode: HistoryMode = 'push', shouldScroll = true) {
+    const requestId = recommendRequestId.current + 1
+    recommendRequestId.current = requestId
     const normalizedValues = {
       ...values,
       beatmapInput: normalizeBeatmapInput(values.beatmapInput),
@@ -130,15 +145,74 @@ export function RecommendPage() {
     try {
       const turnstileToken = turnstile.enabled ? await turnstile.getToken() : ''
       const data = await recommend.mutateAsync({ ...request, turnstileToken })
+      if (recommendRequestId.current !== requestId) {
+        return
+      }
       setResponse(data)
       writeCachedRecommendation(normalizedValues, data)
       updateRecommendationUrl(normalizedValues, historyMode)
-      scrollToPageTop()
+      if (shouldScroll) {
+        scrollToPageTop()
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Request failed')
+      if (recommendRequestId.current === requestId) {
+        setError(err instanceof Error ? err.message : 'Request failed')
+      }
     } finally {
-      setIsRunning(false)
-      turnstile.reset()
+      if (recommendRequestId.current === requestId) {
+        setIsRunning(false)
+        turnstile.reset()
+      }
+    }
+  }
+
+  function runAutoRecommend(values: RecommendFormValues) {
+    if (!parseBeatmapId(values.beatmapInput)) {
+      return
+    }
+
+    void runRecommend(values, 'replace', false)
+  }
+
+  function scheduleRangeRecommend(values: RecommendFormValues) {
+    clearRangeSearchTimeout()
+
+    if (!parseBeatmapId(values.beatmapInput)) {
+      return
+    }
+
+    rangeSearchTimeout.current = window.setTimeout(() => {
+      rangeSearchTimeout.current = null
+      runAutoRecommend(values)
+    }, 500)
+  }
+
+  async function resetRecommendations() {
+    clearRangeSearchTimeout()
+    recommendRequestId.current += 1
+    defaultRequestId.current += 1
+    const requestId = defaultRequestId.current
+
+    setIsRunning(false)
+    setResponse(null)
+    setError('')
+    setDefaultResponse(null)
+    setDefaultLoading(true)
+    window.history.replaceState(null, '', window.location.pathname)
+
+    try {
+      const data = await fetchDefaultRecommendations()
+      if (defaultRequestId.current === requestId) {
+        setDefaultResponse(data)
+      }
+    } catch (err) {
+      if (defaultRequestId.current === requestId) {
+        setError(err instanceof Error ? err.message : 'Request failed')
+      }
+    } finally {
+      if (defaultRequestId.current === requestId) {
+        setDefaultLoading(false)
+      }
     }
   }
 
@@ -158,6 +232,14 @@ export function RecommendPage() {
         turnstileEnabled={turnstile.enabled}
         turnstileRef={turnstile.containerRef}
         onSubmit={runRecommend}
+        onRangeChange={scheduleRangeRecommend}
+        onStatusChange={(values) => {
+          clearRangeSearchTimeout()
+          runAutoRecommend(values)
+        }}
+        onReset={() => {
+          void resetRecommendations()
+        }}
       />
     </div>
   )
