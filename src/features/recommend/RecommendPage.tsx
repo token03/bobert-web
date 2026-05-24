@@ -110,6 +110,7 @@ export function RecommendPage() {
       setResponse(data)
       writeCachedRecommendation(normalizedValues, data)
       updateRecommendationUrl(normalizedValues, historyMode)
+      scrollToPageTop()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed')
     } finally {
@@ -142,6 +143,12 @@ export function RecommendPage() {
     }
 
     window.history.pushState(null, '', nextUrl)
+  }
+
+  function scrollToPageTop() {
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
   }
 
   async function copyBeatmapId(beatmapId: number) {
