@@ -77,7 +77,10 @@ export function RecommendPage() {
       }
 
       setResponse(null)
-      setError('These recommendations are not cached in this tab anymore. Run the search again to refresh them.')
+      form.reset(defaultFilters)
+      setError('')
+      window.history.replaceState(null, '', window.location.pathname)
+      void loadDefaultRecommendations()
     }
 
     restoreFromLocation()
