@@ -141,14 +141,14 @@
 }
 
 .range-field {
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(92px, 1fr);
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   width: 100%;
   min-width: 0;
   height: var(--control-height);
   border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   background: var(--input);
   box-sizing: border-box;
   padding: 0 var(--space-lg) 0 var(--space-xl);
@@ -160,11 +160,11 @@
 
 .range-inputs {
   display: grid;
-  grid-template-columns: minmax(0, 4.5ch) auto minmax(0, 4.5ch);
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   color: var(--muted-soft);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   min-width: 0;
 }
@@ -177,9 +177,10 @@
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
-  font-size: 12px;
+  color: var(--text);
+  font-size: 13px;
   line-height: 1;
-  padding: 0;
+  padding: 0 var(--space-xs);
   text-align: center;
 }
 
@@ -247,7 +248,7 @@ select:focus {
   overflow: hidden;
   min-height: var(--control-height);
   border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   background: var(--input);
 }
 
@@ -268,9 +269,9 @@ select:focus {
 .search-pill input {
   min-height: calc(var(--control-height) - 2px);
   border: 0;
-  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
   background: transparent;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
   padding-top: 0;
   padding-bottom: 0;
@@ -283,7 +284,15 @@ select:focus {
 .search-button.primary-button {
   width: 58px;
   min-height: var(--control-height);
-  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+  border-left: 1px solid var(--border);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+.search-button.primary-button:not(:disabled):hover {
+  background: var(--surface);
+  color: var(--accent-light);
 }
 
 .status-field {
@@ -294,7 +303,7 @@ select:focus {
   min-width: 0;
   height: var(--control-height);
   border: 1px solid var(--border);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   background: var(--input);
   box-sizing: border-box;
   padding: 0 var(--space-xs) 0 var(--space-xl);
@@ -305,7 +314,7 @@ select:focus {
   height: calc(var(--control-height) - 2px);
   border: 0;
   background: transparent;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   padding: 0 var(--space-lg) 0 var(--space-xs);
 }
@@ -451,7 +460,7 @@ button:disabled {
 .filter-controls .ghost-button {
   width: var(--control-height);
   min-height: var(--control-height);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
 }
 
 .ghost-button:hover {
