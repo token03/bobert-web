@@ -13,7 +13,7 @@ export function coverUrl(beatmapsetId: number, twoX = false): string {
 }
 
 export function cardCoverUrl(beatmapsetId: number): string {
-  return `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/card@2x.jpg`
+  return `https://assets.ppy.sh/beatmaps/${beatmapsetId}/covers/card.jpg`
 }
 
 export function userUrl(userId: number): string {

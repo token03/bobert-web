@@ -1209,16 +1209,20 @@ button:disabled {
   justify-content: center;
   justify-items: center;
   gap: var(--space-2xs);
-  min-width: 34px;
+  min-width: 54px;
   text-align: center;
 }
 
 .source-card .stat-row-sub .stat-item strong {
+  color: var(--heading);
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
   justify-self: center;
 }
 
 .source-stat-separator {
-  width: 1px;
+  width: 2px;
   height: 34px;
   background: var(--border);
 }
@@ -1376,6 +1380,10 @@ button:disabled {
   }
 
   .source-card .stat-row-sub .stat-item strong {
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0;
     justify-self: end;
   }
 
