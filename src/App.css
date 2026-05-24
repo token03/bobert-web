@@ -544,6 +544,19 @@ button:disabled {
   gap: var(--space-xl);
 }
 
+.result-list-wrap {
+  position: relative;
+}
+
+.results-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--radius-lg);
+  background: rgba(80, 80, 88, 0.38);
+  pointer-events: auto;
+}
+
 .beatmap-row {
   position: relative;
   display: grid;
