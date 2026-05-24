@@ -553,7 +553,7 @@ button:disabled {
   inset: 0;
   z-index: 2;
   border-radius: var(--radius-lg);
-  background: rgba(80, 80, 88, 0.38);
+  background: rgba(0, 0, 0, 0.56);
   pointer-events: auto;
 }
 
