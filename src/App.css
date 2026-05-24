@@ -490,12 +490,6 @@ button:disabled {
   overflow: hidden;
 }
 
-.source-card:hover,
-.source-card:focus-within {
-  border-color: var(--accent-muted);
-  background: var(--row-hover);
-}
-
 .source-cover {
   width: 100%;
   min-height: 132px;
@@ -535,11 +529,6 @@ button:disabled {
   border-radius: var(--card-overlap) 0 0 var(--card-overlap);
   background: var(--row);
   padding: var(--space-xl) var(--space-xl) var(--space-xl) var(--radius-md);
-}
-
-.source-card:hover .source-content,
-.source-card:focus-within .source-content {
-  background: var(--row-hover);
 }
 
 .source-heading {
