@@ -19,6 +19,7 @@
   --button-size: 42px;
   --action-size: 28px;
   --audio-button-size: 36px;
+  --card-overlap: 1px;
   --cover-size: 96px;
   --cover-size-tablet: 86px;
   --cover-size-mobile: 92px;
@@ -484,7 +485,7 @@ button:disabled {
   align-items: stretch;
   margin: 0 0 var(--space-3xl);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--row);
   overflow: hidden;
 }
@@ -512,6 +513,7 @@ button:disabled {
 
 .source-cover img {
   object-fit: cover;
+  object-position: center;
 }
 
 .source-main {
@@ -527,10 +529,10 @@ button:disabled {
   align-items: center;
   gap: var(--space-2xl);
   min-width: 0;
-  margin-left: calc(var(--radius-lg) * -1);
-  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  margin-left: calc(var(--card-overlap) * -1);
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
   background: var(--row);
-  padding: var(--space-xl) var(--space-4xl) var(--space-xl) var(--radius-lg);
+  padding: var(--space-xl) var(--space-4xl) var(--space-xl) var(--radius-md);
 }
 
 .source-card:hover .source-content,
@@ -618,11 +620,11 @@ button:disabled {
 .beatmap-row {
   position: relative;
   display: grid;
-  grid-template-columns: calc(var(--cover-size) + var(--radius-lg)) minmax(0, 1fr);
+  grid-template-columns: calc(var(--cover-size) + var(--card-overlap)) minmax(0, 1fr);
   align-items: stretch;
   min-height: var(--cover-size-mobile);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--row);
   overflow: hidden;
 }
@@ -740,11 +742,11 @@ button:disabled {
   align-items: center;
   gap: var(--space-2xl);
   min-width: 0;
-  margin-left: calc(var(--radius-lg) * -1);
+  margin-left: calc(var(--card-overlap) * -1);
   border: 1px solid transparent;
-  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
   background: var(--row);
-  padding: calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--radius-lg) - 1px);
+  padding: calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--radius-md) - 1px);
 }
 
 .beatmap-row:hover .map-content {
@@ -1144,13 +1146,17 @@ button:disabled {
   }
 
   .beatmap-row {
-    grid-template-columns: var(--cover-size) minmax(0, 1fr);
+    grid-template-columns: calc(var(--cover-size) + var(--card-overlap)) minmax(0, 1fr);
   }
 }
 
 @media (max-width: 1080px) {
   .result-list {
     grid-template-columns: 1fr;
+  }
+
+  .source-card {
+    grid-template-columns: clamp(180px, 30vw, 260px) minmax(0, 1fr);
   }
 }
 
@@ -1199,11 +1205,11 @@ button:disabled {
   }
 
   .beatmap-row {
-    grid-template-columns: calc(var(--cover-size-tablet) + var(--radius-lg)) minmax(0, 1fr);
+    grid-template-columns: calc(var(--cover-size-tablet) + var(--card-overlap)) minmax(0, 1fr);
   }
 
   .source-card {
-    grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+    grid-template-columns: clamp(160px, 32vw, 240px) minmax(0, 1fr);
   }
 
   .map-content {
@@ -1258,17 +1264,17 @@ button:disabled {
   }
 
   .map-content {
-    margin-top: calc(var(--radius-lg) * -1);
+    margin-top: calc(var(--card-overlap) * -1);
     margin-left: 0;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: calc(var(--radius-lg) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: calc(var(--radius-md) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px);
   }
 
   .source-content {
-    margin-top: calc(var(--radius-lg) * -1);
+    margin-top: calc(var(--card-overlap) * -1);
     margin-left: 0;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    padding: var(--radius-lg) var(--space-xl) var(--space-xl);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: var(--radius-md) var(--space-xl) var(--space-xl);
   }
 
   .beatmap-field,
@@ -1277,7 +1283,7 @@ button:disabled {
   }
 
   .cover-preview {
-    height: calc(var(--cover-size-mobile) + var(--radius-lg));
+    height: calc(var(--cover-size-mobile) + var(--card-overlap));
   }
 
   .map-content {
