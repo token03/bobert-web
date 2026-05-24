@@ -143,7 +143,7 @@ export function RecommendPage() {
   }
 
   async function searchBeatmap(beatmapId: number) {
-    const nextValues = { ...defaultFilters, beatmapInput: String(beatmapId) }
+    const nextValues = { ...form.getValues(), beatmapInput: String(beatmapId) }
     form.reset(nextValues)
     await runRecommend(nextValues)
   }
@@ -164,6 +164,21 @@ export function RecommendPage() {
     await copyText(String(beatmapId))
   }
 
+  const resultsList = (beatmaps: BeatmapMetadata[]) => (
+    <div className="result-list-wrap" aria-busy={isLoading}>
+      <ResultsList
+        beatmaps={beatmaps}
+        onCopy={copyBeatmapId}
+        onSearch={searchBeatmap}
+        isLoading={isLoading}
+        onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
+        activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
+        isPreviewPlaying={audio.isPlaying}
+      />
+      {isLoading ? <div className="results-loading-overlay" aria-hidden="true" /> : null}
+    </div>
+  )
+
   return (
     <main className="app-shell">
       {audio.audioElement}
@@ -171,21 +186,13 @@ export function RecommendPage() {
       <section className="results-panel">
         {error ? <p className="error-text">{error}</p> : null}
 
-        <div className="result-list-wrap" aria-busy={isLoading}>
+        <div className="recommend-layout">
           {response ? (
             <>
-              {recommendForm}
               <SourceBeatmapCard beatmap={response.query.metadata} onCopy={copyBeatmapId} />
+              {recommendForm}
               {response.results.length > 0 ? (
-                <ResultsList
-                  beatmaps={response.results}
-                  onCopy={copyBeatmapId}
-                  onSearch={searchBeatmap}
-                  isLoading={isLoading}
-                  onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
-                  activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
-                  isPreviewPlaying={audio.isPlaying}
-                />
+                resultsList(response.results)
               ) : (
                 <p className="empty-results">No results found</p>
               )}
@@ -194,15 +201,7 @@ export function RecommendPage() {
             resultBeatmaps.length > 0 ? (
               <>
                 {recommendForm}
-                <ResultsList
-                  beatmaps={resultBeatmaps}
-                  onCopy={copyBeatmapId}
-                  onSearch={searchBeatmap}
-                  isLoading={isLoading}
-                  onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
-                  activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
-                  isPreviewPlaying={audio.isPlaying}
-                />
+                {resultsList(resultBeatmaps)}
               </>
             ) : (
               <>
@@ -223,7 +222,6 @@ export function RecommendPage() {
               <p className="empty-results">Loading recommendations</p>
             </>
           )}
-          {isLoading ? <div className="results-loading-overlay" aria-hidden="true" /> : null}
         </div>
       </section>
 

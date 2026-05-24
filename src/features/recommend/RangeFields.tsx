@@ -15,7 +15,7 @@ export function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProp
 
   return (
     <div className="range-field">
-      <span>{label}</span>
+      <span>{label}:</span>
       <span className="range-inputs">
         <input
           inputMode="decimal"
