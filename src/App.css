@@ -76,33 +76,33 @@
 
 .control-panel {
   position: sticky;
-  top: 0;
+  top: var(--space-xl);
   z-index: 10;
   display: grid;
   gap: var(--space-xl);
-  margin-bottom: var(--space-2xl);
-  border: 1px solid var(--border-strong);
-  border-top: 0;
-  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  background: var(--panel-solid);
+  margin-bottom: var(--space-3xl);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--row);
   padding: var(--space-2xl);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  box-shadow: var(--shadow);
 }
 
 .primary-controls,
-.advanced-filters {
+.advanced-filters,
+.filter-controls {
   display: grid;
   gap: var(--space-xl);
 }
 
 .primary-controls {
-  grid-template-columns: minmax(180px, 1.2fr) repeat(3, minmax(118px, 0.8fr)) minmax(118px, 0.7fr) 72px auto;
+  grid-template-columns: minmax(260px, 0.95fr) minmax(0, 1.6fr);
   align-items: end;
 }
 
-.form-actions {
-  display: flex;
-  gap: var(--space-xl);
+.filter-controls {
+  grid-template-columns: repeat(3, minmax(118px, 1fr)) minmax(118px, 0.8fr) auto;
+  align-items: end;
 }
 
 .advanced-filters {
@@ -189,14 +189,61 @@ select:focus {
   display: block;
 }
 
+.search-pill {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--input);
+}
+
+.search-pill:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 calc(var(--space-xs) + var(--space-2xs)) var(--accent-soft);
+}
+
+.search-pill:has(input.has-field-error) {
+  border-color: rgba(255, 74, 134, 0.46);
+}
+
+.search-pill:has(input.has-field-error:focus) {
+  border-color: rgba(255, 74, 134, 0.58);
+  box-shadow: 0 0 0 calc(var(--space-xs) + var(--space-2xs)) rgba(255, 74, 134, 0.12);
+}
+
+.search-pill input {
+  border: 0;
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill);
+  background: transparent;
+}
+
+.search-pill input:focus {
+  box-shadow: none;
+}
+
+.search-button.primary-button {
+  width: 58px;
+  min-height: 100%;
+  border-radius: 0 var(--radius-pill) var(--radius-pill) 0;
+}
+
 input.has-field-error {
   border-color: rgba(255, 74, 134, 0.46);
+  padding-right: calc(var(--space-5xl) + var(--space-xs));
+}
+
+.search-pill input.has-field-error {
   padding-right: calc(var(--space-5xl) + var(--space-xs));
 }
 
 input.has-field-error:focus {
   border-color: rgba(255, 74, 134, 0.58);
   box-shadow: 0 0 0 calc(var(--space-xs) + var(--space-2xs)) rgba(255, 74, 134, 0.12);
+}
+
+.search-pill input.has-field-error:focus {
+  box-shadow: none;
 }
 
 .field-error-icon {
@@ -210,6 +257,10 @@ input.has-field-error:focus {
   color: rgba(255, 74, 134, 0.82);
   outline: none;
   transform: translateY(-50%);
+}
+
+.search-field .field-error-icon {
+  right: calc(58px + var(--space-xl));
 }
 
 .field-error-icon svg {
@@ -450,11 +501,6 @@ button:disabled {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--panel);
-  padding: var(--space-2xl);
-  box-shadow: var(--shadow);
 }
 
 .empty-results {
@@ -483,7 +529,7 @@ button:disabled {
   display: grid;
   grid-template-columns: minmax(calc(240px + var(--card-overlap)), calc(340px + var(--card-overlap))) minmax(0, 1fr);
   align-items: stretch;
-  margin: 0 0 var(--space-3xl);
+  margin: 0 0 var(--space-xl);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--row);
@@ -1109,7 +1155,11 @@ button:disabled {
 
 @media (max-width: 1180px) {
   .primary-controls {
-    grid-template-columns: repeat(4, minmax(130px, 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  .filter-controls {
+    grid-template-columns: repeat(4, minmax(118px, 1fr)) auto;
   }
 
   .advanced-filters {
@@ -1117,7 +1167,7 @@ button:disabled {
   }
 
   .beatmap-field {
-    grid-column: span 2;
+    grid-column: 1 / -1;
   }
 
   .beatmap-row {
@@ -1164,6 +1214,14 @@ button:disabled {
     grid-template-columns: 1fr 1fr;
   }
 
+  .primary-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .beatmap-field,
   .status-field {
     grid-column: 1 / -1;
@@ -1172,6 +1230,10 @@ button:disabled {
   .primary-button,
   .ghost-button {
     width: 100%;
+  }
+
+  .search-button.primary-button {
+    width: 58px;
   }
 
   .form-actions {
@@ -1236,6 +1298,10 @@ button:disabled {
   .advanced-filters,
   .beatmap-row {
     grid-template-columns: 1fr;
+  }
+
+  .filter-controls {
+    grid-template-columns: 1fr 1fr;
   }
 
   .map-content {

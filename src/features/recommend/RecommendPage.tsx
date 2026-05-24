@@ -92,6 +92,29 @@ export function RecommendPage() {
     }
   }, [form])
 
+  function updateRecommendationUrl(values: RecommendFormValues, historyMode: HistoryMode) {
+    if (historyMode === 'none') {
+      return
+    }
+
+    const search = recommendSearchParams(values)
+    const nextUrl = `${window.location.pathname}?${search}`
+    const currentUrl = `${window.location.pathname}${window.location.search}`
+
+    if (historyMode === 'replace' || currentUrl === nextUrl) {
+      window.history.replaceState(null, '', nextUrl)
+      return
+    }
+
+    window.history.pushState(null, '', nextUrl)
+  }
+
+  function scrollToPageTop() {
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    })
+  }
+
   async function runRecommend(values: RecommendFormValues, historyMode: HistoryMode = 'push') {
     const normalizedValues = {
       ...values,
@@ -127,29 +150,15 @@ export function RecommendPage() {
 
   const resultBeatmaps = response?.results ?? defaultResponse?.results ?? []
   const showDefaultResults = !response && defaultResponse !== null
-
-  function updateRecommendationUrl(values: RecommendFormValues, historyMode: HistoryMode) {
-    if (historyMode === 'none') {
-      return
-    }
-
-    const search = recommendSearchParams(values)
-    const nextUrl = `${window.location.pathname}?${search}`
-    const currentUrl = `${window.location.pathname}${window.location.search}`
-
-    if (historyMode === 'replace' || currentUrl === nextUrl) {
-      window.history.replaceState(null, '', nextUrl)
-      return
-    }
-
-    window.history.pushState(null, '', nextUrl)
-  }
-
-  function scrollToPageTop() {
-    window.requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    })
-  }
+  const recommendForm = (
+    <RecommendForm
+      form={form}
+      isLoading={isLoading}
+      turnstileEnabled={turnstile.enabled}
+      turnstileRef={turnstile.containerRef}
+      onSubmit={runRecommend}
+    />
+  )
 
   async function copyBeatmapId(beatmapId: number) {
     await copyText(String(beatmapId))
@@ -159,14 +168,6 @@ export function RecommendPage() {
     <main className="app-shell">
       {audio.audioElement}
 
-      <RecommendForm
-        form={form}
-        isLoading={isLoading}
-        turnstileEnabled={turnstile.enabled}
-        turnstileRef={turnstile.containerRef}
-        onSubmit={runRecommend}
-      />
-
       <section className="results-panel">
         {error ? <p className="error-text">{error}</p> : null}
 
@@ -174,6 +175,7 @@ export function RecommendPage() {
           {response ? (
             <>
               <SourceBeatmapCard beatmap={response.query.metadata} onCopy={copyBeatmapId} />
+              {recommendForm}
               {response.results.length > 0 ? (
                 <ResultsList
                   beatmaps={response.results}
@@ -190,22 +192,36 @@ export function RecommendPage() {
             </>
           ) : showDefaultResults ? (
             resultBeatmaps.length > 0 ? (
-              <ResultsList
-                beatmaps={resultBeatmaps}
-                onCopy={copyBeatmapId}
-                onSearch={searchBeatmap}
-                isLoading={isLoading}
-                onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
-                activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
-                isPreviewPlaying={audio.isPlaying}
-              />
+              <>
+                {recommendForm}
+                <ResultsList
+                  beatmaps={resultBeatmaps}
+                  onCopy={copyBeatmapId}
+                  onSearch={searchBeatmap}
+                  isLoading={isLoading}
+                  onPlayPreview={(beatmap: BeatmapMetadata) => audio.playPreview(beatmap)}
+                  activePreviewSetId={audio.activeBeatmap?.beatmapset_id ?? null}
+                  isPreviewPlaying={audio.isPlaying}
+                />
+              </>
             ) : (
-              <p className="empty-results">No results found</p>
+              <>
+                {recommendForm}
+                <p className="empty-results">No results found</p>
+              </>
             )
           ) : defaultLoading ? (
-            <p className="empty-results">Loading recommendations</p>
-          ) : error ? null : (
-            <p className="empty-results">Loading recommendations</p>
+            <>
+              {recommendForm}
+              <p className="empty-results">Loading recommendations</p>
+            </>
+          ) : error ? (
+            recommendForm
+          ) : (
+            <>
+              {recommendForm}
+              <p className="empty-results">Loading recommendations</p>
+            </>
           )}
           {isLoading ? <div className="results-loading-overlay" aria-hidden="true" /> : null}
         </div>
