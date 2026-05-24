@@ -172,7 +172,7 @@ export function RecommendPage() {
 
         {response ? (
           <>
-            <SourceBeatmapCard beatmap={response.query.metadata} count={response.count} label="Source map" />
+            <SourceBeatmapCard beatmap={response.query.metadata} count={response.count} />
             {response.results.length > 0 ? (
               <ResultsList
                 beatmaps={response.results}

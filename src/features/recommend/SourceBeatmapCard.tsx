@@ -1,6 +1,6 @@
 import { Clock, Metronome, Star } from 'lucide-react'
 import type { KeyboardEvent } from 'react'
-import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatNumber, resultsLabel, statusClass, statusLabel } from '../../shared/format'
+import { displayArtist, displayTitle, formatFixedNumber, formatLength, formatNumber, statusClass, statusLabel } from '../../shared/format'
 import type { BeatmapMetadata } from '../../shared/types'
 import { Stat } from '../../shared/ui/Stat'
 import { beatmapUrl, cardCoverUrl, userUrl } from '../../shared/urls'
@@ -8,10 +8,9 @@ import { beatmapUrl, cardCoverUrl, userUrl } from '../../shared/urls'
 type SourceBeatmapCardProps = {
   beatmap: BeatmapMetadata
   count: number
-  label: string
 }
 
-export function SourceBeatmapCard({ beatmap, count, label }: SourceBeatmapCardProps) {
+export function SourceBeatmapCard({ beatmap, count }: SourceBeatmapCardProps) {
   const openBeatmap = () => window.open(beatmapUrl(beatmap), '_blank', 'noreferrer')
   const handleCardKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     if ((event.target as HTMLElement).closest('a, button')) {
@@ -32,22 +31,25 @@ export function SourceBeatmapCard({ beatmap, count, label }: SourceBeatmapCardPr
 
       <div className="source-content">
         <div className="source-main">
-          <span className="source-label">{label}</span>
-          <div className="title-line">
-            <span className="map-title">{displayTitle(beatmap)}</span>
-          </div>
-          <div className="artist-line">by {displayArtist(beatmap)}</div>
-          <div className="version-line">
-            <span>{beatmap.version ?? 'Unknown difficulty'}</span>
-          </div>
-          <div className="match-line">
-            <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
-            <CreatorLink beatmap={beatmap} />
+          <div className="source-heading">
+            <div className="source-copy">
+              <div className="title-line">
+                <span className="map-title">{displayTitle(beatmap)}</span>
+              </div>
+              <div className="artist-line">by {displayArtist(beatmap)}</div>
+              <div className="version-line">
+                <span>{beatmap.version ?? 'Unknown difficulty'}</span>
+              </div>
+            </div>
+            <div className="source-meta">
+              <strong className="source-results">{formatResults(count)}</strong>
+              <span className={`status-label ${statusClass(beatmap.status)}`}>{statusLabel(beatmap.status)}</span>
+              <CreatorLink beatmap={beatmap} />
+            </div>
           </div>
         </div>
 
         <div className="source-side">
-          <strong className="source-results">{resultsLabel(count)}</strong>
           <div className="stat-strip source-stat-strip">
             <div className="stat-row stat-row-main">
               <Stat label={<Star aria-label="Star" />} value={formatNumber(beatmap.stars, 2)} featured />
@@ -65,6 +67,10 @@ export function SourceBeatmapCard({ beatmap, count, label }: SourceBeatmapCardPr
       </div>
     </article>
   )
+}
+
+function formatResults(count: number) {
+  return `(${count} ${count === 1 ? 'result' : 'results'})`
 }
 
 function CreatorLink({ beatmap }: { beatmap: BeatmapMetadata }) {
