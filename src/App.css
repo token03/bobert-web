@@ -19,8 +19,8 @@
   --button-size: 42px;
   --action-size: 28px;
   --audio-button-size: 36px;
-  --card-overlap: 1px;
-  --cover-size: 96px;
+  --card-overlap: var(--space-lg);
+  --cover-size: 100px;
   --cover-size-tablet: 86px;
   --cover-size-mobile: 92px;
   --icon-xs: 15px;
@@ -481,7 +481,7 @@ button:disabled {
 
 .source-card {
   display: grid;
-  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  grid-template-columns: minmax(calc(240px + var(--card-overlap)), calc(340px + var(--card-overlap))) minmax(0, 1fr);
   align-items: stretch;
   margin: 0 0 var(--space-3xl);
   border: 1px solid var(--border);
@@ -532,7 +532,7 @@ button:disabled {
   gap: var(--space-2xl);
   min-width: 0;
   margin-left: calc(var(--card-overlap) * -1);
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  border-radius: var(--card-overlap) 0 0 var(--card-overlap);
   background: var(--row);
   padding: var(--space-xl) var(--space-4xl) var(--space-xl) var(--radius-md);
 }
@@ -677,6 +677,7 @@ button:disabled {
 
 .cover-preview img {
   object-fit: cover;
+  object-position: calc(50% - (var(--card-overlap) / 2)) center;
 }
 
 .beatmap-row:hover .cover-preview:not(:disabled)::after,
@@ -748,7 +749,7 @@ button:disabled {
   min-width: 0;
   margin-left: calc(var(--card-overlap) * -1);
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--card-overlap) var(--radius-md) var(--radius-md) var(--card-overlap);
   background: var(--row);
   padding: calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--radius-md) - 1px);
 }
@@ -1155,7 +1156,7 @@ button:disabled {
   }
 
   .source-card {
-    grid-template-columns: clamp(180px, 30vw, 260px) minmax(0, 1fr);
+    grid-template-columns: clamp(calc(180px + var(--card-overlap)), calc(30vw + var(--card-overlap)), calc(260px + var(--card-overlap))) minmax(0, 1fr);
   }
 }
 
@@ -1208,7 +1209,7 @@ button:disabled {
   }
 
   .source-card {
-    grid-template-columns: clamp(160px, 32vw, 240px) minmax(0, 1fr);
+    grid-template-columns: clamp(calc(160px + var(--card-overlap)), calc(32vw + var(--card-overlap)), calc(240px + var(--card-overlap))) minmax(0, 1fr);
   }
 
   .map-content {
@@ -1265,14 +1266,14 @@ button:disabled {
   .map-content {
     margin-top: calc(var(--card-overlap) * -1);
     margin-left: 0;
-    border-radius: var(--radius-md);
+    border-radius: var(--card-overlap) var(--card-overlap) var(--radius-md) var(--radius-md);
     padding: calc(var(--radius-md) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px);
   }
 
   .source-content {
     margin-top: calc(var(--card-overlap) * -1);
     margin-left: 0;
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    border-radius: var(--card-overlap) var(--card-overlap) 0 0;
     padding: var(--radius-md) var(--space-xl) var(--space-xl);
   }
 
