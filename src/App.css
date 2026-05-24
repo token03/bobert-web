@@ -731,7 +731,6 @@ button:disabled {
 }
 
 .beatmap-row:hover .map-content {
-  border-color: var(--accent-muted);
   background: var(--row-hover);
 }
 
