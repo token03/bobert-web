@@ -133,8 +133,7 @@
   min-width: 0;
 }
 
-.field > span:not(.input-with-status),
-.range-field > span:first-child,
+.field > span:not(.input-with-status, [aria-hidden='true']),
 .slider-label {
   color: var(--muted);
   font-size: 12px;
@@ -160,6 +159,23 @@
 
 .range-field > span {
   grid-column: auto;
+}
+
+.range-field > span:first-child,
+.status-field > span:first-child {
+  display: grid;
+  place-items: center;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: var(--muted);
+}
+
+.range-field > span:first-child svg,
+.status-field > span:first-child svg {
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  fill: none;
+  stroke: currentColor;
 }
 
 .range-inputs {

@@ -1,4 +1,4 @@
-import { Loader, RotateCcw, Search, XCircle } from 'lucide-react'
+import { Clock, Loader, Metronome, RotateCcw, Search, Star, Tag, XCircle } from 'lucide-react'
 import type { UseFormReturn } from 'react-hook-form'
 import { defaultFilters, normalizeBeatmapInput, parseBeatmapId } from './filters'
 import type { RecommendFormValues } from './filters'
@@ -86,12 +86,14 @@ export function RecommendForm({ form, isLoading, onSubmit, onRangeChange, onStat
           </label>
 
           <div className="filter-controls">
-            <RangeFields label="Star" min={values.minSr} max={values.maxSr} setMin={(value) => updateRange('minSr', value)} setMax={(value) => updateRange('maxSr', value)} />
-            <RangeFields label="Length" min={values.minLength} max={values.maxLength} setMin={(value) => updateRange('minLength', value)} setMax={(value) => updateRange('maxLength', value)} />
-            <RangeFields label="BPM" min={values.minBpm} max={values.maxBpm} setMin={(value) => updateRange('minBpm', value)} setMax={(value) => updateRange('maxBpm', value)} />
+            <RangeFields label="Star" icon={<Star strokeWidth={3} />} min={values.minSr} max={values.maxSr} setMin={(value) => updateRange('minSr', value)} setMax={(value) => updateRange('maxSr', value)} />
+            <RangeFields label="Length" icon={<Clock strokeWidth={3} />} min={values.minLength} max={values.maxLength} setMin={(value) => updateRange('minLength', value)} setMax={(value) => updateRange('maxLength', value)} />
+            <RangeFields label="BPM" icon={<Metronome strokeWidth={3} />} min={values.minBpm} max={values.maxBpm} setMin={(value) => updateRange('minBpm', value)} setMax={(value) => updateRange('maxBpm', value)} />
 
             <label className="field status-field">
-              <span>Status:</span>
+              <span aria-hidden="true">
+                <Tag strokeWidth={3} />
+              </span>
               <select
                 {...status}
                 onChange={(event) => {

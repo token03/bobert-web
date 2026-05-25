@@ -1,12 +1,15 @@
+import type { ReactNode } from 'react'
+
 type RangeFieldsProps = {
   label: string
+  icon: ReactNode
   min: string
   max: string
   setMin: (value: string) => void
   setMax: (value: string) => void
 }
 
-export function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProps) {
+export function RangeFields({ label, icon, min, max, setMin, setMax }: RangeFieldsProps) {
   function updateNumber(value: string, update: (value: string) => void) {
     if (/^\d*\.?\d*$/.test(value)) {
       update(value)
@@ -15,7 +18,7 @@ export function RangeFields({ label, min, max, setMin, setMax }: RangeFieldsProp
 
   return (
     <div className="range-field">
-      <span>{label}:</span>
+      <span aria-hidden="true">{icon}</span>
       <span className="range-inputs">
         <input
           inputMode="decimal"
