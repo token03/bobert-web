@@ -1,5 +1,4 @@
 import { Loader, RotateCcw, Search, XCircle } from 'lucide-react'
-import type { RefObject } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { defaultFilters, normalizeBeatmapInput, parseBeatmapId } from './filters'
 import type { RecommendFormValues } from './filters'
@@ -8,8 +7,6 @@ import { RangeFields } from './RangeFields'
 type RecommendFormProps = {
   form: UseFormReturn<RecommendFormValues>
   isLoading: boolean
-  turnstileEnabled: boolean
-  turnstileRef: RefObject<HTMLDivElement | null>
   onSubmit: (values: RecommendFormValues) => Promise<void>
   onRangeChange: (values: RecommendFormValues) => void
   onStatusChange: (values: RecommendFormValues) => void
@@ -19,7 +16,7 @@ type RecommendFormProps = {
 
 type RangeFieldName = 'minSr' | 'maxSr' | 'minLength' | 'maxLength' | 'minBpm' | 'maxBpm'
 
-export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef, onSubmit, onRangeChange, onStatusChange, onPasteSearch, onReset }: RecommendFormProps) {
+export function RecommendForm({ form, isLoading, onSubmit, onRangeChange, onStatusChange, onPasteSearch, onReset }: RecommendFormProps) {
   const values = form.watch()
   const beatmapError = form.formState.errors.beatmapInput?.message
   const submitDisabled = isLoading || form.formState.isSubmitting
@@ -120,7 +117,6 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
           </div>
         </div>
 
-        {turnstileEnabled ? <div className="turnstile-hidden" ref={turnstileRef} /> : null}
       </form>
     </>
   )

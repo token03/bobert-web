@@ -613,15 +613,6 @@ button:disabled {
   background: transparent;
 }
 
-.turnstile-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
-
 .results-panel {
   display: flex;
   flex: 1 1 auto;
@@ -638,6 +629,11 @@ button:disabled {
   font-size: clamp(18px, 2vw, 26px);
   font-weight: 800;
   text-align: center;
+}
+
+.loading-recommendations {
+  align-items: start;
+  padding-top: var(--space-5xl);
 }
 
 .error-text {

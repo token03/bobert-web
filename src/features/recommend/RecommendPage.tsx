@@ -230,13 +230,12 @@ export function RecommendPage() {
 
   const resultBeatmaps = response?.results ?? defaultResponse?.results ?? []
   const showDefaultResults = !response && defaultResponse !== null
+  const showLoadingRecommendations = defaultLoading || (!error && !response && !showDefaultResults)
   const recommendForm = (
     <div className="sticky-search-wrap">
       <RecommendForm
         form={form}
         isLoading={isLoading}
-        turnstileEnabled={turnstile.enabled}
-        turnstileRef={turnstile.containerRef}
         onSubmit={runRecommend}
         onRangeChange={scheduleRangeRecommend}
         onStatusChange={(values) => {
@@ -275,6 +274,7 @@ export function RecommendPage() {
 
   return (
     <main className="app-shell">
+      {turnstile.widget}
       {audio.audioElement}
 
       <section className="results-panel">
@@ -295,11 +295,9 @@ export function RecommendPage() {
             ) : (
               <p className="empty-results">No results found</p>
             )
-          ) : defaultLoading ? (
-            <p className="empty-results">Loading recommendations</p>
-          ) : error ? null : (
-            <p className="empty-results">Loading recommendations</p>
-          )}
+          ) : showLoadingRecommendations ? (
+            <p className="empty-results loading-recommendations">Loading recommendations</p>
+          ) : null}
         </div>
       </section>
 
