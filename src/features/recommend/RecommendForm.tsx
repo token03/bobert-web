@@ -1,7 +1,7 @@
 import { Loader, RotateCcw, Search, XCircle } from 'lucide-react'
 import type { RefObject } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import { defaultFilters, normalizeBeatmapInput } from './filters'
+import { defaultFilters, normalizeBeatmapInput, parseBeatmapId } from './filters'
 import type { RecommendFormValues } from './filters'
 import { RangeFields } from './RangeFields'
 
@@ -13,12 +13,13 @@ type RecommendFormProps = {
   onSubmit: (values: RecommendFormValues) => Promise<void>
   onRangeChange: (values: RecommendFormValues) => void
   onStatusChange: (values: RecommendFormValues) => void
+  onPasteSearch: (values: RecommendFormValues) => void
   onReset: (values: RecommendFormValues) => void
 }
 
 type RangeFieldName = 'minSr' | 'maxSr' | 'minLength' | 'maxLength' | 'minBpm' | 'maxBpm'
 
-export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef, onSubmit, onRangeChange, onStatusChange, onReset }: RecommendFormProps) {
+export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef, onSubmit, onRangeChange, onStatusChange, onPasteSearch, onReset }: RecommendFormProps) {
   const values = form.watch()
   const beatmapError = form.formState.errors.beatmapInput?.message
   const submitDisabled = isLoading || form.formState.isSubmitting
@@ -34,6 +35,19 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
   function updateRange(field: RangeFieldName, value: string) {
     form.setValue(field, value)
     onRangeChange({ ...form.getValues(), [field]: value })
+  }
+
+  function searchPastedBeatmap(value: string) {
+    if (!parseBeatmapId(value)) {
+      return false
+    }
+
+    const beatmapInput = normalizeBeatmapInput(value)
+    const nextValues = { ...form.getValues(), beatmapInput }
+    form.clearErrors('beatmapInput')
+    form.setValue('beatmapInput', beatmapInput, { shouldValidate: false })
+    onPasteSearch(nextValues)
+    return true
   }
 
   return (
@@ -53,6 +67,11 @@ export function RecommendForm({ form, isLoading, turnstileEnabled, turnstileRef,
                   onChange={(event) => {
                     form.clearErrors('beatmapInput')
                     beatmapInput.onChange(event)
+                  }}
+                  onPaste={(event) => {
+                    if (searchPastedBeatmap(event.clipboardData.getData('text'))) {
+                      event.preventDefault()
+                    }
                   }}
                   onBlur={(event) => {
                     beatmapInput.onBlur(event)

@@ -243,6 +243,10 @@ export function RecommendPage() {
           clearRangeSearchTimeout()
           runAutoRecommend(values)
         }}
+        onPasteSearch={(values) => {
+          clearRangeSearchTimeout()
+          void runRecommend(values)
+        }}
         onReset={(values) => {
           void resetRecommendations(values)
         }}
