@@ -25,11 +25,13 @@ declare global {
 }
 
 export const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ''
+const turnstileTokenMaxAgeMs = 240_000
 
 export function useTurnstile() {
   const containerRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
   const readyTokenRef = useRef<string | null>(null)
+  const tokenIssuedAtRef = useRef(0)
   const isCheckingRef = useRef(false)
   const pendingResolveRef = useRef<((token: string) => void) | null>(null)
   const pendingRejectRef = useRef<((error: Error) => void) | null>(null)
@@ -42,10 +44,14 @@ export function useTurnstile() {
     pendingRejectRef.current = null
   }, [])
 
+  const hasFreshToken = useCallback(() => {
+    return Boolean(readyTokenRef.current && Date.now() - tokenIssuedAtRef.current < turnstileTokenMaxAgeMs)
+  }, [])
+
   const executeWidget = useCallback(() => {
     const widgetId = widgetIdRef.current
 
-    if (!window.turnstile || !widgetId || isCheckingRef.current || readyTokenRef.current) {
+    if (!window.turnstile || !widgetId || isCheckingRef.current || hasFreshToken()) {
       return
     }
 
@@ -56,7 +62,7 @@ export function useTurnstile() {
     } catch (err) {
       rejectPending(err instanceof Error ? err : new Error('Turnstile verification failed.'))
     }
-  }, [rejectPending])
+  }, [hasFreshToken, rejectPending])
 
   useEffect(() => {
     if (!turnstileSiteKey || !containerRef.current || widgetIdRef.current) {
@@ -74,6 +80,7 @@ export function useTurnstile() {
         execution: 'execute',
         callback: (token) => {
           isCheckingRef.current = false
+          tokenIssuedAtRef.current = Date.now()
           setStatus('ready')
           if (pendingResolveRef.current) {
             pendingResolveRef.current(token)
@@ -85,13 +92,20 @@ export function useTurnstile() {
         },
         'expired-callback': () => {
           readyTokenRef.current = null
+          tokenIssuedAtRef.current = 0
           setStatus('waiting')
           rejectPending(new Error('Turnstile verification expired. Please try again.'))
-          executeWidget()
+          if (document.visibilityState === 'visible') {
+            if (widgetIdRef.current && window.turnstile) {
+              window.turnstile.reset(widgetIdRef.current)
+            }
+            executeWidget()
+          }
         },
         'error-callback': () => {
           setStatus('error')
           readyTokenRef.current = null
+          tokenIssuedAtRef.current = 0
           rejectPending(new Error('Turnstile verification failed.'))
         },
       })
@@ -122,11 +136,39 @@ export function useTurnstile() {
     }
   }, [executeWidget, rejectPending])
 
+  useEffect(() => {
+    function refreshVisibleToken() {
+      if (document.visibilityState === 'visible' && !hasFreshToken()) {
+        readyTokenRef.current = null
+        tokenIssuedAtRef.current = 0
+        if (widgetIdRef.current && window.turnstile) {
+          isCheckingRef.current = false
+          window.turnstile.reset(widgetIdRef.current)
+        }
+        executeWidget()
+      }
+    }
+
+    document.addEventListener('visibilitychange', refreshVisibleToken)
+
+    return () => {
+      document.removeEventListener('visibilitychange', refreshVisibleToken)
+    }
+  }, [executeWidget, hasFreshToken])
+
   const getToken = useCallback((): Promise<string> => {
-    if (readyTokenRef.current) {
+    if (hasFreshToken() && readyTokenRef.current) {
       const token = readyTokenRef.current
       readyTokenRef.current = null
+      tokenIssuedAtRef.current = 0
       return Promise.resolve(token)
+    }
+
+    readyTokenRef.current = null
+    tokenIssuedAtRef.current = 0
+    if (widgetIdRef.current && window.turnstile) {
+      isCheckingRef.current = false
+      window.turnstile.reset(widgetIdRef.current)
     }
 
     return new Promise((resolve, reject) => {
@@ -142,10 +184,11 @@ export function useTurnstile() {
 
       executeWidget()
     })
-  }, [executeWidget, rejectPending])
+  }, [executeWidget, hasFreshToken, rejectPending])
 
   const reset = useCallback(() => {
     readyTokenRef.current = null
+    tokenIssuedAtRef.current = 0
     if (widgetIdRef.current && window.turnstile) {
       try {
         isCheckingRef.current = false
