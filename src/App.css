@@ -352,7 +352,7 @@ select:focus {
 .range-inputs input,
 .status-field select {
   color: var(--text);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1;
