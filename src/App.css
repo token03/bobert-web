@@ -89,7 +89,6 @@
   top: 0;
   z-index: 10;
   background: var(--bg);
-  margin: calc(var(--space-xl) * -1) 0;
   padding: var(--space-xl) 0;
 }
 
@@ -659,7 +658,7 @@ button:disabled {
 
 .recommend-layout {
   display: grid;
-  gap: var(--space-xl);
+  gap: 0;
 }
 
 .recommend-layout > .source-card {
