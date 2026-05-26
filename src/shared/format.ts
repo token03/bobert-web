@@ -61,5 +61,5 @@ export function statusLabel(value: string | null): string {
 
 export function statusClass(value: string | null): string {
   const label = statusLabel(value)
-  return `badge--${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
+  return `status-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`
 }

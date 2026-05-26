@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { Clock, Loader, Metronome, RotateCcw, Search, Star, Tag, XCircle } from 'lucide-react'
 import type { UseFormReturn } from 'react-hook-form'
 import { defaultFilters, normalizeBeatmapInput, parseBeatmapId } from './filters'
@@ -53,14 +52,14 @@ export function RecommendForm({ form, isLoading, onSubmit, onRangeChange, onStat
       <form className="control-panel" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="primary-controls">
           <label className="field beatmap-field search-field">
-            <span className="u-visually-hidden">Search</span>
+            <span className="sr-only">Search</span>
             <span className="input-with-status">
               <span className="search-pill">
                 <input
                   required
                   aria-invalid={beatmapError ? 'true' : 'false'}
                   aria-describedby={beatmapError ? 'beatmap-error' : undefined}
-                  className={clsx(beatmapError && 'has-field-error')}
+                  className={beatmapError ? 'has-field-error' : undefined}
                   {...beatmapInput}
                   onChange={(event) => {
                     form.clearErrors('beatmapInput')
@@ -77,9 +76,9 @@ export function RecommendForm({ form, isLoading, onSubmit, onRangeChange, onStat
                   }}
                   placeholder="1872396 or https://osu.ppy.sh/beatmaps/1872396"
                 />
-                <button className="button button--primary search-button" type="submit" disabled={submitDisabled} aria-label="Recommend">
+                <button className="primary-button search-button" type="submit" disabled={submitDisabled} aria-label="Recommend">
                   {submitDisabled ? <Loader className="spinner-icon" /> : <Search />}
-                  <span className="u-visually-hidden">Recommend</span>
+                  <span className="sr-only">Recommend</span>
                 </button>
               </span>
               {beatmapError ? <FieldErrorIcon id="beatmap-error" label="Invalid beatmap ID" /> : null}
@@ -91,8 +90,8 @@ export function RecommendForm({ form, isLoading, onSubmit, onRangeChange, onStat
             <RangeFields label="BPM" icon={<Metronome strokeWidth={3} />} min={values.minBpm} max={values.maxBpm} setMin={(value) => updateRange('minBpm', value)} setMax={(value) => updateRange('maxBpm', value)} />
             <RangeFields label="Length" icon={<Clock strokeWidth={3} />} min={values.minLength} max={values.maxLength} setMin={(value) => updateRange('minLength', value)} setMax={(value) => updateRange('maxLength', value)} />
 
-            <label className="field control-shell control-shell--icon status-field">
-              <span className="control-shell__icon" aria-hidden="true">
+            <label className="field status-field">
+              <span aria-hidden="true">
                 <Tag strokeWidth={3} />
               </span>
               <select
@@ -113,9 +112,9 @@ export function RecommendForm({ form, isLoading, onSubmit, onRangeChange, onStat
               </select>
             </label>
 
-            <button className="button button--ghost button--icon" type="button" onClick={resetForm}>
+            <button className="ghost-button" type="button" onClick={resetForm}>
               <RotateCcw />
-              <span className="u-visually-hidden">Reset</span>
+              <span className="sr-only">Reset</span>
             </button>
           </div>
         </div>

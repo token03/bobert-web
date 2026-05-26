@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { Pause, Play, Volume2, VolumeX } from 'lucide-react'
 import type { BeatmapMetadata } from '../../shared/types'
 
@@ -37,12 +36,12 @@ export function AudioPreviewBar({
 
   return (
     <aside
-      className={clsx('audio-pill', visible ? 'is-visible' : 'is-hidden')}
+      className={visible ? 'audio-pill is-visible' : 'audio-pill is-hidden'}
       aria-label={`Audio preview player for ${beatmap.title}`}
       onPointerDown={onPointerDown}
       onFocus={onPointerDown}
     >
-      <button type="button" className="button button--ghost button--circle audio-control-button" onClick={onTogglePlay} aria-label={isPlaying ? 'Pause preview' : 'Play preview'}>
+      <button type="button" className="audio-control-button" onClick={onTogglePlay} aria-label={isPlaying ? 'Pause preview' : 'Play preview'}>
         {isPlaying ? <Pause className="filled-icon" /> : <Play className="filled-icon" />}
       </button>
 
@@ -61,7 +60,7 @@ export function AudioPreviewBar({
       </div>
 
       <div className="audio-volume">
-        <button type="button" className="button button--ghost button--circle audio-control-button" onClick={onToggleMuted} aria-label={muted ? 'Unmute preview' : 'Mute preview'}>
+        <button type="button" className="audio-control-button" onClick={onToggleMuted} aria-label={muted ? 'Unmute preview' : 'Mute preview'}>
           {muted || volume === 0 ? <VolumeX /> : <Volume2 />}
         </button>
         <input
