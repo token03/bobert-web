@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import type { ReactNode } from 'react'
 
 type StatProps = {
@@ -8,7 +9,7 @@ type StatProps = {
 
 export function Stat({ featured = false, label, value }: StatProps) {
   return (
-    <div className={featured ? 'stat-item featured-stat' : 'stat-item'}>
+    <div className={clsx('stat-item', featured && 'featured-stat')}>
       <span>{label}</span>
       <strong>{value}</strong>
     </div>

@@ -7,10 +7,10 @@ import { copyText } from '../../shared/copy'
 import type { BeatmapMetadata, DefaultRecommendResponse, RecommendResponse } from '../../shared/types'
 import { buildRecommendRequest, defaultFilters, normalizeBeatmapInput, parseBeatmapId } from './filters'
 import type { RecommendFormValues } from './filters'
+import { BeatmapCard } from './BeatmapCard'
 import { RecommendForm } from './RecommendForm'
 import { readCachedRecommendation, recommendSearchParams, valuesFromRecommendSearch, writeCachedRecommendation } from './recommendHistory'
 import { ResultsList } from './ResultsList'
-import { SourceBeatmapCard } from './SourceBeatmapCard'
 import { useRecommend } from './useRecommend'
 import { useRecommendForm } from './useRecommendForm'
 
@@ -272,6 +272,22 @@ export function RecommendPage() {
     </div>
   )
 
+  function renderResults() {
+    if (response) {
+      return response.results.length > 0 ? resultsList(response.results) : <p className="empty-results">No results found</p>
+    }
+
+    if (showDefaultResults) {
+      return resultBeatmaps.length > 0 ? resultsList(resultBeatmaps) : <p className="empty-results">No results found</p>
+    }
+
+    if (showLoadingRecommendations) {
+      return <p className="empty-results loading-recommendations">Loading recommendations</p>
+    }
+
+    return null
+  }
+
   return (
     <main className="app-shell">
       {turnstile.widget}
@@ -281,23 +297,9 @@ export function RecommendPage() {
         {error ? <p className="error-text">{error}</p> : null}
 
         <div className="recommend-layout">
-          {response ? <SourceBeatmapCard beatmap={response.query.metadata} onCopy={copyBeatmapId} /> : null}
+          {response ? <BeatmapCard variant="source" beatmap={response.query.metadata} onCopy={copyBeatmapId} /> : null}
           {recommendForm}
-          {response ? (
-            response.results.length > 0 ? (
-              resultsList(response.results)
-            ) : (
-              <p className="empty-results">No results found</p>
-            )
-          ) : showDefaultResults ? (
-            resultBeatmaps.length > 0 ? (
-              resultsList(resultBeatmaps)
-            ) : (
-              <p className="empty-results">No results found</p>
-            )
-          ) : showLoadingRecommendations ? (
-            <p className="empty-results loading-recommendations">Loading recommendations</p>
-          ) : null}
+          {renderResults()}
         </div>
       </section>
 

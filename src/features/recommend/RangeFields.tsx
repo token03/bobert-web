@@ -17,8 +17,8 @@ export function RangeFields({ label, icon, min, max, setMin, setMax }: RangeFiel
   }
 
   return (
-    <div className="range-field">
-      <span aria-hidden="true">{icon}</span>
+    <div className="control-shell control-shell--icon range-field">
+      <span className="control-shell__icon" aria-hidden="true">{icon}</span>
       <span className="range-inputs">
         <input
           inputMode="decimal"
