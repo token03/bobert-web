@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const defaultFilters = {
   beatmapInput: '',
-  topK: '40',
+  topK: '200',
   minSr: '',
   maxSr: '',
   minBpm: '',
