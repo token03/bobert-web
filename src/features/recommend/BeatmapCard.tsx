@@ -45,7 +45,12 @@ export function BeatmapCard({ beatmap, onCopy, onSearch, isLoading, onPlayPrevie
         title={hasPreview ? (isCoverActive ? 'Pause preview' : 'Play preview') : 'No preview available'}
       >
         {beatmap.beatmapset_id ? (
-          <img src={coverUrl(beatmap.beatmapset_id)} alt="" />
+          <img 
+	    src={coverUrl(beatmap.beatmapset_id)} 
+	    alt="" 
+	    loading="lazy"
+	    decoding="async"
+	  />
         ) : (
           <span className="cover-placeholder">osu!</span>
         )}

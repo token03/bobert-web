@@ -797,6 +797,8 @@ button:disabled {
   border-radius: var(--radius-md);
   background: var(--row);
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-size: 104px;
 }
 
 .beatmap-row:hover {
