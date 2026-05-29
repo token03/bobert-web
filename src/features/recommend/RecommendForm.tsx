@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Clock, Loader, Metronome, RotateCcw, Search, Star, Tag, XCircle } from 'lucide-react'
 import type { UseFormReturn } from 'react-hook-form'
 import { defaultFilters, normalizeBeatmapInput, parseBeatmapId } from './filters'
@@ -46,6 +47,29 @@ export function RecommendForm({ form, isLoading, onSubmit, onRangeChange, onStat
     onPasteSearch(nextValues)
     return true
   }
+
+  useEffect(() => {
+    function pasteSearch(event: ClipboardEvent) {
+      const target = event.target
+
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable) ||
+        window.getSelection()?.toString()
+      ) {
+        return
+      }
+
+      if (searchPastedBeatmap(event.clipboardData?.getData('text') ?? '')) {
+        event.preventDefault()
+      }
+    }
+
+    window.addEventListener('paste', pasteSearch)
+    return () => window.removeEventListener('paste', pasteSearch)
+  })
 
   return (
     <>
