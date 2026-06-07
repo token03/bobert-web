@@ -9,8 +9,8 @@ import { buildRecommendRequest, defaultFilters, normalizeBeatmapInput, parseBeat
 import type { RecommendFormValues } from './filters'
 import { RecommendForm } from './RecommendForm'
 import { readCachedRecommendation, recommendSearchParams, valuesFromRecommendSearch, writeCachedRecommendation } from './recommendHistory'
+import { BeatmapCard } from './BeatmapCard'
 import { ResultsList } from './ResultsList'
-import { SourceBeatmapCard } from './SourceBeatmapCard'
 import { useRecommend } from './useRecommend'
 import { useRecommendForm } from './useRecommendForm'
 
@@ -281,7 +281,7 @@ export function RecommendPage() {
         {error ? <p className="error-text">{error}</p> : null}
 
         <div className="recommend-layout">
-          {response ? <SourceBeatmapCard beatmap={response.query.metadata} onCopy={copyBeatmapId} /> : null}
+          {response ? <BeatmapCard variant="source" beatmap={response.query.metadata} onCopy={copyBeatmapId} /> : null}
           {recommendForm}
           {response ? (
             response.results.length > 0 ? (

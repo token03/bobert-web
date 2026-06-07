@@ -661,15 +661,19 @@ button:disabled {
   padding: var(--space-2xl) var(--space-3xl);
 }
 
-.source-card {
+.beatmap-card {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(calc(240px + var(--card-overlap)), calc(340px + var(--card-overlap))) minmax(0, 1fr);
   align-items: stretch;
-  margin: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: var(--row);
   overflow: hidden;
+}
+
+.source-card {
+  grid-template-columns: minmax(calc(240px + var(--card-overlap)), calc(340px + var(--card-overlap))) minmax(0, 1fr);
+  margin: 0;
 }
 
 .recommend-layout {
@@ -709,16 +713,19 @@ button:disabled {
   min-width: 0;
 }
 
-.source-content {
+.beatmap-card-content {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
-  align-items: stretch;
   gap: var(--space-2xl);
   min-width: 0;
   margin-left: calc(var(--card-overlap) * -1);
-  border-radius: var(--card-overlap) 0 0 var(--card-overlap);
   background: var(--row);
+}
+
+.source-content {
+  align-items: stretch;
+  border-radius: var(--card-overlap) 0 0 var(--card-overlap);
   padding: var(--space-xl) var(--space-xl) var(--space-xl) var(--radius-md);
 }
 
@@ -788,15 +795,8 @@ button:disabled {
 }
 
 .beatmap-row {
-  position: relative;
-  display: grid;
   grid-template-columns: calc(var(--cover-size) + var(--card-overlap)) minmax(0, 1fr);
-  align-items: stretch;
   min-height: var(--cover-size-mobile);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--row);
-  overflow: hidden;
   content-visibility: auto;
   contain-intrinsic-size: 104px;
 }
@@ -910,16 +910,9 @@ button:disabled {
 }
 
 .map-content {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
   align-items: center;
-  gap: var(--space-2xl);
-  min-width: 0;
-  margin-left: calc(var(--card-overlap) * -1);
   border: 1px solid transparent;
   border-radius: var(--card-overlap) var(--radius-md) var(--radius-md) var(--card-overlap);
-  background: var(--row);
   padding: calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--space-xl) - 1px) calc(var(--radius-md) - 1px);
 }
 
